@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HaruBayan - Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="../HaruBayan_ADMIN/imgs/logo-harubayan.png"/>
+  <!-- Font Awesome CDN for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-Z4CnzU2sNzKjwZZfHzZqEtK0FyXgEK+iDszS9Vwkp5dNbhvG0kZ0Rf6f3aN5Kr7CJ0efhM8SFeozvY3rsOYEUQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f8f8f8;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Sakura petal animation contained within the container */
+    .container {
+      position: relative;
+      padding: 30px;
+      flex: 1;
+      overflow: hidden; /* Prevents petals from appearing outside the container */
+      text-align: center;
+      height: 100vh; /* Ensure it takes full screen height */
+    }
+
+    .petal {
+      position: absolute;
+      top: -10%;
+      width: 30px;
+      height: 30px;
+      background-color: #f589a8; /* Sakura color */
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: fall 2s linear infinite;
+    }
+
+    /* Animation for the falling petals */
+    @keyframes fall {
+      0% {
+        transform: translateX(0) translateY(0);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateX(50px) translateY(100vh); /* End falling within the container's height */
+        opacity: 0;
+      }
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background-color: #8b0013;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+    .navbar .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .nav-logo {
+      height: 32px;
+      border-radius: 100%;
+    }
+
+    .nav-brand {
+      font-size: 16px;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      font-weight: bold;
+      color: white;
+    }
+
+    .nav-center {
+      text-align: center;
+      font-size: 25px;
+      font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      font-weight: bold;
+      color: white;
+      flex: 2;
+      margin-left: -50%;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .user-menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .user-icon {
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      color: white;
+      padding: 5px;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+      border: 1px solid #fff8f8;
+      border-radius: 100%;
+    }
+
+    .user-icon:hover {
+      background-color: #a8001a;
+      border: 1px solid #fff8f8;
+      border-radius: 100%;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      color: #8b0013;
+      min-width: 150px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      margin-top: 10px;
+      z-index: 1;
+      border: 1px solid #8b0013;
+    }
+
+    .dropdown a {
+      display: block;
+      padding: 12px;
+      text-decoration: none;
+      color: #8b0013;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+
+    .dropdown a:hover {
+      background-color: #ffdada;
+    }
+
+    /* MAIN CONTENT */
+    .container {
+      text-align: center;
+      padding: 30px;
+      flex: 1;
+    }
+
+    .welcome {
+      font-size: 40px;
+      margin-bottom: 4px;
+      margin-top: 10px;
+      font-weight: bold;
+      font-family:Georgia, 'Times New Roman', Times, serif;
+      color: #8b0013;
+    }
+
+    .datetime {
+      margin-bottom: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #555;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-bottom: -30px;
+    }
+
+    .btn {
+      background-color: #8b0013;
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 30px;
+      font-weight: bold;
+      border: none;
+      transition: background 0.3s;
+      height: 300px;
+      width: 500px;
+    }
+
+    .btn:hover {
+      background-color: #a8001a;
+    }
+
+    .btn small {
+      display: block;
+      font-size: 16px;
+      margin-top: 10px;
+      font-weight: normal;
+    }
+
+    /* FOOTER */
+    footer {
+      background-color: #8b0013;
+      color: white;
+      text-align: center;
+      font-size: 13px;
+      padding: 15px;
+      margin-top: 30px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo-container">
+      <img src="imgs/logo-harubayan.png" alt="Logo" class="nav-logo">
+      <div>
+        <div class="nav-brand">Haru-Bayan</div>
+      </div>
+    </div>
+    
+    <div class="nav-center">Admin Portal</div>
+
+    <div class="nav-right">
+      <div class="user-menu">
+        <!-- User icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="user-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14c3.866 0 7 2.686 7 6H5c0-3.314 3.134-6 7-6zm0-2c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+        </svg>
+
+        <div class="dropdown">
+          <a href="../HaruBayan_ADMIN/authetication.html" id="logout-btn">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container">
+    <!-- Sakura petals inside the container -->
+    <div class="petal" style="animation-duration: 8s; animation-delay: 0s; left: 10%;"></div>
+    <div class="petal" style="animation-duration: 9s; animation-delay: 1s; left: 25%;"></div>
+    <div class="petal" style="animation-duration: 7s; animation-delay: 2s; left: 50%;"></div>
+    <div class="petal" style="animation-duration: 6s; animation-delay: 3s; left: 75%;"></div>
+    <div class="petal" style="animation-duration: 10s; animation-delay: 4s; left: 80%;"></div>
+
+    <div class="welcome">WELCOME Admin <span id="admin-name">@NAME</span>!</div>
+    <div class="datetime" id="datetime"></div>
+
+    <div class="buttons">
+        <a href="recipe.html">
+            <button class="btn">RECIPES <small>View and Manage all recipe entries</small></button>
+          </a>
+          
+          <a href="orders.html">
+            <button class="btn">ORDERS <small>View all customer orders</small></button>
+          </a>
+          
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    Copyright © 2025 Haru-Bayan. Created by MyTech Corp.
+  </footer>
+
+  <!-- JS FUNCTIONALITY -->
+  <script>
+    // Function to update date and time
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById('datetime').textContent = now.toLocaleString();
+    }
+
+    // Update date and time every second
+    setInterval(updateDateTime, 1000);
+
+    // Initial call to show the time immediately when the page loads
+    updateDateTime();
+
+    // Get name from URL
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get("user");
+    if (username) {
+      document.getElementById("admin-name").textContent = username;
+    }
+
+    // Toggle dropdown
+    const userIcon = document.querySelector('.user-icon');
+    const dropdown = document.querySelector('.dropdown');
+
+    userIcon.addEventListener('click', () => {
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-menu')) {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    // Logout functionality
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      // Clear session or perform any other logout actions here
+      window.location.href = "login.html"; // Redirect to login page
+    });
+  </script>
+
+</body>
+</html>

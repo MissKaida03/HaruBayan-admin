@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Orders</title>
+  <link rel="icon" type="image/png" href="../HaruBayan_ADMIN/imgs/logo-harubayan.png"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+    font-family: 'Helvetica', sans-serif;
+    background-color: #f8f7f2;
+    color: #333;
+    position: relative;
+    overflow-y: auto; /* Enable vertical scrolling */
+    }
+
+    .main-header {
+      background-color: #8b0013;
+      color: #faf7f7;
+      text-align: center;
+      padding: 20px;
+      border-bottom: 2px solid #fffefd;
+    }
+
+    .main-header h1 {
+      font-family: 'Sawarabi Mincho', serif;
+      font-size: 36px;
+      font-weight: bold;
+      color: #fffdfc;
+    }
+
+    #datetime {
+      font-size: 14px;
+      color: #f7f5f5;
+      margin-top: 10px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin: 20px;
+      padding: 8px 20px;
+      background-color: #8b0013;
+      color: white;
+      font-size: 14px;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #d39379;
+    }
+
+    .section {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+      border-radius: 8px;
+    }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .orders-table th, .orders-table td {
+      border: 1px solid #8b0013;
+      padding: 12px;
+      text-align: center;
+      font-size: 16px;
+      color: #0e0707;
+    }
+
+    .orders-table th {
+      background-color: #f7d4d9;
+    }
+
+    .pending {
+      font-weight: bold;
+    }
+
+    .delivered {
+      font-weight: bold;
+    }
+
+    .mark-btn {
+      padding: 8px 18px;
+      background-color: #d186b8;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .mark-btn:hover {
+      background-color: #1ad843;
+    }
+
+    .view-btn {
+      padding: 8px 15px;
+      background-color: #9c2737;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .view-btn:hover {
+      background-color: #5e35b1;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 30px;
+      border-radius: 8px;
+      width: 50%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Order List Items in Modal */
+    #orderItemsList {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .order-item {
+      background-color: #ebdddb;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      border:1px solid #8b0013;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .item-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .item-description {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .item-quantity {
+      font-size: 14px;
+      color: #777;
+    }
+
+    /* Sakura Animation */
+    @keyframes sakura {
+      0% {
+        transform: translateY(-100px);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+
+    .sakura {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      background-color: #ff819a;
+      border-radius: 50%;
+      animation: sakura 5s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    /* Create multiple sakura flowers */
+    .sakura:nth-child(1) {
+      left: 10%;
+      animation-duration: 12s;
+    }
+
+    .sakura:nth-child(2) {
+      left: 25%;
+      animation-duration: 14s;
+    }
+
+    .sakura:nth-child(3) {
+      left: 40%;
+      animation-duration: 16s;
+    }
+
+    .sakura:nth-child(4) {
+      left: 55%;
+      animation-duration: 18s;
+    }
+
+    .sakura:nth-child(5) {
+      left: 70%;
+      animation-duration: 20s;
+    }
+
+    .sakura:nth-child(6) {
+      left: 85%;
+      animation-duration: 22s;
+    }
+
+    /* Adjust sakura size */
+    .sakura {
+      width: 15px;
+      height: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sakura effects -->
+  <div class="sakura"></div>
+  <div class="sakura"></div>
+  <div class="sakura"></div>
+  <div class="sakura"></div>
+  <div class="sakura"></div>
+  <div class="sakura"></div>
+
+  <header class="main-header">
+    <h1>🍽️ Orders Dashboard</h1>
+    <div id="datetime"></div>
+  </header>
+
+  <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+
+  <div class="section">
+    <h2>🍽️ Dine-in Orders</h2>
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Table Number</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="dinein-body">
+        <!-- Dine-in orders will be dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>🚗 Take-out Orders</h2>
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="takeout-body">
+        <!-- Take-out orders will be dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal for viewing order items -->
+  <div id="orderModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h3>Ordered Items</h3>
+      <div id="orderItemsList">
+        <!-- List of items will be dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dineinOrders = [
+      { customer: "Christine", tableNumber: 5, status: "Pending", items: [
+        { name: "Herbal Tea", description: "A calming drink", quantity: 2 },
+        { name: "Grilled Veggies", description: "Fresh grilled vegetables", quantity: 1 }
+      ] },
+      { customer: "Jade", tableNumber: 12, status: "Pending", items: [
+        { name: "Ramen", description: "Spicy ramen with broth", quantity: 2 },
+        { name: "Fruit Salad", description: "Mixed fruits", quantity: 1 }
+      ] },
+    ];
+
+    const takeoutOrders = [
+      { customer: "Reiven", status: "Delivered", items: [
+        { name: "Healthy Soup", description: "Vegetable-based soup", quantity: 2 },
+        { name: "Fruit Juice", description: "Fresh orange juice", quantity: 1 }
+      ] },
+      { customer: "James", status: "Pending", items: [
+        { name: "Herbal Juice", description: "Refreshing herb drink", quantity: 2 },
+        { name: "Salad", description: "Fresh green salad", quantity: 1 }
+      ] },
+    ];
+
+    const dineinTbody = document.getElementById('dinein-body');
+    const takeoutTbody = document.getElementById('takeout-body');
+    const orderModal = document.getElementById('orderModal');
+    const orderItemsList = document.getElementById('orderItemsList');
+
+    function renderOrders() {
+      // Render Dine-in Orders
+      dineinTbody.innerHTML = '';
+      dineinOrders.forEach((order, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${order.customer}</td>
+          <td>${order.tableNumber}</td>
+          <td class="${order.status === 'Delivered' ? 'delivered' : 'pending'}">${order.status}</td>
+          <td>
+            <button class="view-btn" onclick="viewItems(${index}, 'dinein')">View Items</button>
+            ${order.status === 'Pending' 
+              ? `<button class="mark-btn" onclick="markAsDelivered('dinein', ${index})">Mark as Delivered</button>` 
+              : '✔'}
+          </td>
+        `;
+        dineinTbody.appendChild(row);
+      });
+
+      // Render Take-out Orders
+      takeoutTbody.innerHTML = '';
+      takeoutOrders.forEach((order, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${order.customer}</td>
+          <td class="${order.status === 'Delivered' ? 'delivered' : 'pending'}">${order.status}</td>
+          <td>
+            <button class="view-btn" onclick="viewItems(${index}, 'takeout')">View Items</button>
+            ${order.status === 'Pending' 
+              ? `<button class="mark-btn" onclick="markAsDelivered('takeout', ${index})">Mark as Delivered</button>` 
+              : '✔'}
+          </td>
+        `;
+        takeoutTbody.appendChild(row);
+      });
+    }
+
+    function markAsDelivered(orderType, index) {
+      if (orderType === 'dinein') {
+        dineinOrders[index].status = 'Delivered';
+      } else if (orderType === 'takeout') {
+        takeoutOrders[index].status = 'Delivered';
+      }
+      renderOrders();
+    }
+
+    function viewItems(index, orderType) {
+      let items = [];
+      if (orderType === 'dinein') {
+        items = dineinOrders[index].items;
+      } else if (orderType === 'takeout') {
+        items = takeoutOrders[index].items;
+      }
+
+      orderItemsList.innerHTML = '';
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('order-item');
+        div.innerHTML = `
+          <div class="item-name">${item.name}</div>
+          <div class="item-description">${item.description}</div>
+          <div class="item-quantity">Quantity: ${item.quantity}</div>
+        `;
+        orderItemsList.appendChild(div);
+      });
+
+      // Open Modal
+      orderModal.style.display = 'block';
+    }
+
+    function closeModal() {
+      orderModal.style.display = 'none';
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const date = now.toLocaleDateString();
+      const time = now.toLocaleTimeString();
+      document.getElementById('datetime').textContent = `${date} - ${time}`;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    renderOrders();
+  </script>
+
+</body>
+</html>
