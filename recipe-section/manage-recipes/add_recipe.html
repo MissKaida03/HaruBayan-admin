@@ -8,207 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #fff0f3;
-      margin: 0;
-      padding: 0;
-    }
-   
-    main {
-      padding: 30px;
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.616)
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-    }
-    input, textarea, select {
-      width: 95%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #6b0202;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #8b0013;
-      color: white;
-      padding: 10px 20px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #b6001f;
-    }
-    .recipe-card {
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 10px;
-      background: #fafafa;
-    }
-    img.recipe-img {
-      max-width: 100px;
-      border-radius: 8px;
-    }
-
-    /* NAVBAR */
-  .navbar {
-    background-color: #8b0013;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-  }
-  
-  .navbar .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-  }
-  
-  .nav-logo {
-    height: 32px;
-    border-radius: 100%;
-  }
-  
-  .nav-brand {
-    font-size: 16px;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-weight: bold;
-    color: white;
-  }
-  
-  .nav-center {
-    text-align: center;
-    font-size: 25px;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-weight: bold;
-    color: white;
-    flex: 2;
-    margin-left: -50%;
-  }
-  
-  .nav-right {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .user-menu {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .user-icon {
-    width: 23px;
-    height: 23px;
-    cursor: pointer;
-    color: white;
-    padding: 5px;
-    border-radius: 50%;
-    transition: background-color 0.3s;
-    border: 1px solid #fff8f8;
-    border-radius: 100%;
-  }
-  
-  .user-icon:hover {
-    background-color: #a8001a;
-    border: 1px solid #fff8f8;
-    border-radius: 100%;
-  }
-  
-  .dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    background-color: white;
-    color: #8b0013;
-    min-width: 150px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    margin-top: 10px;
-    z-index: 1;
-    border: 1px solid #8b0013;
-  }
-  
-  .dropdown a {
-    display: block;
-    padding: 12px;
-    text-decoration: none;
-    color: #8b0013;
-    font-weight: bold;
-    border-radius: 5px;
-  }
-  
-  .dropdown a:hover {
-    background-color: #ffdada;
-  }
-
-  /* === PAGE HEADER === */
-  .page-header {
-      text-align: center;
-      margin-top: -5%;
-      margin-bottom: 5px;
-    }
-
-    .page-header h1 {
-      font-size: 40px;
-    }
-
-    .page-header p {
-      font-size: 20px;
-    }
-    
-    /*back button*/
-    .back-btn-container {
-      padding: 20px;
-      text-align: left;
-    }
-
-    .back-btn {
-      display: inline-block;
-      padding: 10px 15px;
-      background-color: #8b0013;
-      color: white;
-      text-decoration: none;
-      font-size: 16px;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-
-    .back-btn:hover {
-      background-color: #a8001a;
-    }
-
-    .back-btn i {
-      margin-right: 8px;
-    }
-
-    /* FOOTER */
-  footer {
-    background-color: #8b0013;
-    color: white;
-    text-align: center;
-    font-size: 13px;
-    padding: 15px;
-    margin-top: 30px;
-  }
-  </style>
+  <link rel="stylesheet" href="add_recipe.css">
+  <script src="add_recipe.js" defer></script>
 </head>
 <body>
 
@@ -236,11 +37,11 @@
       </div>
     </div>
   </div>
-<!-- Back Button -->
-<div class="back-btn-container">
-  <a href="../AdminRecipeChoice.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back </a>
-</div>
 
+  <!-- Back Button -->
+  <div class="back-btn-container">
+    <a href="../AdminRecipeChoice.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back </a>
+  </div>
 
   <header class="page-header">
     <h1>Recipe Management</h1>
@@ -248,192 +49,74 @@
   </header>
 
   <main>
-    <h2 id="form-title">Add New Recipe</h2>
-    <form id="recipe-form">
-      <input type="hidden" id="recipe-id">
-      <label for="name">Recipe Name</label>
-      <input type="text" id="name" required>
+    <div class="content-container">
 
-      <label for="category">Category</label>
-      <select id="category" required>
-        <option>Main Dish</option>
-        <option>Noodles</option>
-        <option>Rice Dishes</option>
-        <option>Soups & Stews</option>
-        <option>Side Dishes</option>
-        <option>Appetizers</option>
-        <option>Street Food & Snacks</option>
-        <option>Desserts & Sweets</option>
-        <option>Beverages</option>
-      </select>
+      <!-- LEFT: Recipe List with Search and Sort -->
+      <div id="recipes-list-container">
+        <h3>Existing Recipes</h3>
+        
+        <!-- Search & Sort Controls -->
+        <div class="controls">
+          <input type="text" id="search-bar" placeholder="Search recipes...">
+          <select id="sort-category">
+            <option value="">Sort by Category</option>
+            <option>Main Dish</option>
+            <option>Noodles</option>
+            <option>Rice Dishes</option>
+            <option>Soups & Stews</option>
+            <option>Side Dishes</option>
+            <option>Appetizers</option>
+            <option>Street Food & Snacks</option>
+            <option>Desserts & Sweets</option>
+            <option>Beverages</option>
+          </select>
+        </div>
+  
+        <div id="recipes-list" class="recipe-list-grid"></div>
+      </div>
 
-      <label for="description">Description</label>
-      <textarea id="description" rows="4" required></textarea>
-
-      <label for="image">Upload Image</label>
-      <input type="file" id="image" accept="image/*">
-
-      <button type="submit">Save Recipe</button>
-    </form>
-    <p id="status"></p>
-
-    <h3>Existing Recipes</h3>
-    <div id="recipes-list"></div>
+      <!-- RIGHT: Add/Edit Form -->
+      <div id="recipe-form-container">
+        <h2 id="form-title">Add New Recipe</h2>
+        <form id="recipe-form">
+          <input type="hidden" id="recipe-id">
+  
+          <label for="name">Recipe Name</label>
+          <input type="text" id="name" required>
+  
+          <label for="category">Category</label>
+          <select id="category" required>
+            <option>Main Dish</option>
+            <option>Noodles</option>
+            <option>Rice Dishes</option>
+            <option>Soups & Stews</option>
+            <option>Side Dishes</option>
+            <option>Appetizers</option>
+            <option>Street Food & Snacks</option>
+            <option>Desserts & Sweets</option>
+            <option>Beverages</option>
+          </select>
+  
+          <label for="description">Description</label>
+          <textarea id="description" rows="4" required></textarea>
+  
+          <label for="image">Upload Image</label>
+          <input type="file" id="image" accept="image/*">
+  
+          <button type="submit">Save Recipe</button>
+          <p id="status"></p>
+        </form>
+      </div>
+  
+    </div>
   </main>
 
+  
   <footer>
     Copyright © 2025 Haru-Bayan. Created by MyTech Corp.
-  </footer>
+  </footer>    
 
-  <script>
-    const SUPABASE_URL = 'https://lngdoqimxolarajflobo.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic'; // Replace with actual key
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const form = document.getElementById('recipe-form');
-    const status = document.getElementById('status');
-    const recipesList = document.getElementById('recipes-list');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      status.textContent = 'Processing...';
-
-      const id = document.getElementById('recipe-id').value;
-      const name = document.getElementById('name').value;
-      const category = document.getElementById('category').value;
-      const description = document.getElementById('description').value;
-      const imageFile = document.getElementById('image').files[0];
-      let image_url = null;
-
-      try {
-        if (imageFile) {
-          const fileExt = imageFile.name.split('.').pop();
-          const fileName = `${Date.now()}.${fileExt}`;
-          const filePath = `recipes/${fileName}`;
-
-          const { error: uploadError } = await client.storage
-            .from('recipe-images')
-            .upload(filePath, imageFile);
-
-          if (uploadError) throw uploadError;
-
-          const { data: urlData } = await client.storage
-            .from('recipe-images')
-            .getPublicUrl(filePath);
-
-          image_url = urlData.publicUrl;
-        }
-
-        if (id) {
-          // Update existing
-          const { data: oldData } = await client.from('recipes').select('image_url').eq('id', id).single();
-          if (image_url && oldData?.image_url) {
-            const oldPath = oldData.image_url.split('/').slice(-2).join('/');
-            await client.storage.from('recipe-images').remove([oldPath]);
-          }
-
-          const { error: updateError } = await client
-            .from('recipes')
-            .update({ name, category, description, ...(image_url && { image_url }) })
-            .eq('id', id);
-
-          if (updateError) throw updateError;
-
-          status.textContent = 'Recipe updated!';
-        } else {
-          const { error: insertError } = await client
-            .from('recipes')
-            .insert([{ name, category, description, image_url }]);
-
-          if (insertError) throw insertError;
-
-          status.textContent = 'Recipe added!';
-        }
-
-        form.reset();
-        document.getElementById('recipe-id').value = '';
-        document.getElementById('form-title').textContent = 'Add New Recipe';
-        loadRecipes();
-      } catch (err) {
-        console.error(err);
-        status.textContent = 'Error: ' + err.message;
-      }
-    });
-
-    async function loadRecipes() {
-      const { data, error } = await client
-        .from('recipes')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading:', error);
-        return;
-      }
-
-      recipesList.innerHTML = '';
-      data.forEach(recipe => {
-        const div = document.createElement('div');
-        div.className = 'recipe-card';
-        div.innerHTML = `
-          <strong>${recipe.name}</strong> (${recipe.category})<br>
-          <img class="recipe-img" src="${recipe.image_url}" alt="${recipe.name}" /><br>
-          <em>${recipe.description}</em><br>
-          <small>Created: ${new Date(recipe.created_at).toLocaleString()}</small><br>
-          <button onclick="editRecipe(${recipe.id})">Edit</button>
-          <button onclick="deleteRecipe(${recipe.id}, '${recipe.image_url}')">Delete</button>
-        `;
-        recipesList.appendChild(div);
-      });
-    }
-
-    async function editRecipe(id) {
-      const { data, error } = await client.from('recipes').select('*').eq('id', id).single();
-      if (error) return alert('Error fetching recipe');
-
-      document.getElementById('recipe-id').value = data.id;
-      document.getElementById('name').value = data.name;
-      document.getElementById('category').value = data.category;
-      document.getElementById('description').value = data.description;
-      document.getElementById('form-title').textContent = 'Edit Recipe';
-    }
-
-    async function deleteRecipe(id, image_url) {
-      if (!confirm('Are you sure?')) return;
-
-      const { error } = await client.from('recipes').delete().eq('id', id);
-      if (error) return alert('Failed to delete');
-
-      const path = image_url.split('/').slice(-2).join('/');
-      await client.storage.from('recipe-images').remove([path]);
-
-      loadRecipes();
-    }
-
-    loadRecipes();
-
-    // Toggle dropdown
-    const userIcon = document.querySelector('.user-icon');
-    const dropdown = document.querySelector('.dropdown');
-
-    userIcon.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.user-menu')) {
-
-        dropdown.style.display = 'none';
-      }
-    });
   
-    // Logout functionality
-    document.getElementById("logout-btn").addEventListener("click", function () {
-  console.log("Redirecting...");
-  window.location.href = "./adminLOGIN.html";
-});
 
-  </script>
 </body>
 </html>

@@ -1,0 +1,272 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #fff0f3;
+    margin: 0;
+    padding: 0;
+  }
+  
+  main {
+    padding: 30px;
+    max-width: 90%;
+    margin: auto;
+    margin-top: -3%;
+  }
+  
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+  
+  input, textarea, select {
+    width: 95%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #6b0202;
+    font-size: 1rem;
+  }
+  
+  button {
+    background-color: #8b0013;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #b6001f;
+  }
+  
+  img.recipe-img {
+    max-width: 100px;
+    border-radius: 8px;
+  }
+  
+  .content-container {
+    display: flex;
+    gap: 30px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 20px;
+  }
+  
+  /* Left Section - Recipe List */
+  #recipes-list-container {
+    flex: 1;
+    border: 2px solid #6b0202;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f8fbff;
+    max-height: 600px;  /* Adjust the height as per your design needs */
+    overflow-y: auto;  /* Enable vertical scrolling */
+     position: relative; 
+     padding-bottom: 10px;
+  }
+
+  #recipes-list-container h3, .controls {
+    position: sticky;
+  top: 0;
+  background-color: #f8fbff;  /* Matches the container's background */
+  z-index: 1;  /* Ensures the header is above the content */
+  }
+  
+  /* Right Section - Form */
+  #recipe-form-container {
+    flex: 1;
+    border: 2px solid #6b0202;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f0d1d1;
+  }
+  
+  /* Search + Sort Controls */
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  
+  #search-bar,
+  #sort-category {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #6b0202;
+    color: #fff8f8;
+  }
+  #search-bar::placeholder {
+    color: white
+  }
+  
+  
+  /* Recipe Cards */
+  .recipe-list-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .recipe-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* NAVBAR */
+  .navbar {
+    background-color: #8b0013;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .navbar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .nav-logo {
+    height: 32px;
+    border-radius: 100%;
+  }
+  
+  .nav-brand {
+    font-size: 16px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .nav-center {
+    text-align: center;
+    font-size: 25px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    color: white;
+    flex: 2;
+    margin-left: -50%;
+  }
+  
+  .nav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .user-menu {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .user-icon {
+    width: 23px;
+    height: 23px;
+    cursor: pointer;
+    color: white;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+    border: 1px solid #fff8f8;
+    border-radius: 100%;
+  }
+  
+  .user-icon:hover {
+    background-color: #a8001a;
+    border: 1px solid #fff8f8;
+    border-radius: 100%;
+  }
+  
+  .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    color: #8b0013;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-top: 10px;
+    z-index: 1;
+    border: 1px solid #8b0013;
+  }
+  
+  .dropdown a {
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+    color: #8b0013;
+    font-weight: bold;
+    border-radius: 5px;
+  }
+  
+  .dropdown a:hover {
+    background-color: #ffdada;
+  }
+  
+  /* === PAGE HEADER === */
+  .page-header {
+      text-align: center;
+      margin-top: -5%;
+      margin-bottom: 5px;
+    }
+  
+    .page-header h1 {
+      font-size: 40px;
+    }
+  
+    .page-header p {
+      font-size: 20px;
+    }
+    
+    /*back button*/
+    .back-btn-container {
+      padding: 20px;
+      text-align: left;
+    }
+  
+    .back-btn {
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #8b0013;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+  
+    .back-btn:hover {
+      background-color: #a8001a;
+    }
+  
+    .back-btn i {
+      margin-right: 8px;
+    }
+  
+    /* FOOTER */
+  footer {
+    background-color: #8b0013;
+    color: white;
+    text-align: center;
+    font-size: 13px;
+    padding: 15px;
+    margin-top: 30px;
+  }
+  
+  
