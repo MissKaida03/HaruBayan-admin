@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HaruBayan - Admin Portal</title>
+  <link rel="stylesheet" href="./admin-login.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div class="login-box">
+    <h2>ADMIN PORTAL LOGIN</h2>
+    <div class="login-card">
+        <img src="../imgs/logo-harubayan.png" alt="Logo" class="logo" />
+        <h3 class="brand">Haru-Bayan</h3>
+
+        <input type="text" placeholder="Username" class="username" />
+        <input type="password" placeholder="Password" class="password" />
+        <button>LOGIN</button>
+
+        <div id="login-notification" class="notification">
+          Login successful! Welcome <span id="admin-name"></span>.
+        </div>
+        
+    </div>
+  </div>
+
+  <script src="./admin-login.js"></script>
+</body>
+</html>

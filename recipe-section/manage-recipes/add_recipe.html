@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Recipe Admin Panel</title>
-  <link rel="icon" type="image/png" href="../HaruBayan-admin/imgs/logo-harubayan.png"/>
+  <title>Admin - Recipe Management</title>
+  <link rel="icon" type="image/png" href="../../imgs/logo-harubayan.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
@@ -14,19 +15,14 @@
       margin: 0;
       padding: 0;
     }
-    header {
-      background-color: #8b0013;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
+   
     main {
       padding: 30px;
       max-width: 800px;
       margin: auto;
       background: white;
       border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.616)
     }
     label {
       display: block;
@@ -34,11 +30,11 @@
       font-weight: 600;
     }
     input, textarea, select {
-      width: 100%;
+      width: 95%;
       padding: 10px;
       margin-top: 5px;
       border-radius: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid #6b0202;
       font-size: 1rem;
     }
     button {
@@ -65,18 +61,190 @@
       max-width: 100px;
       border-radius: 8px;
     }
-    footer {
+
+    /* NAVBAR */
+  .navbar {
+    background-color: #8b0013;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .navbar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .nav-logo {
+    height: 32px;
+    border-radius: 100%;
+  }
+  
+  .nav-brand {
+    font-size: 16px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .nav-center {
+    text-align: center;
+    font-size: 25px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    color: white;
+    flex: 2;
+    margin-left: -50%;
+  }
+  
+  .nav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .user-menu {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .user-icon {
+    width: 23px;
+    height: 23px;
+    cursor: pointer;
+    color: white;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+    border: 1px solid #fff8f8;
+    border-radius: 100%;
+  }
+  
+  .user-icon:hover {
+    background-color: #a8001a;
+    border: 1px solid #fff8f8;
+    border-radius: 100%;
+  }
+  
+  .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    color: #8b0013;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-top: 10px;
+    z-index: 1;
+    border: 1px solid #8b0013;
+  }
+  
+  .dropdown a {
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+    color: #8b0013;
+    font-weight: bold;
+    border-radius: 5px;
+  }
+  
+  .dropdown a:hover {
+    background-color: #ffdada;
+  }
+
+  /* === PAGE HEADER === */
+  .page-header {
       text-align: center;
-      margin-top: 40px;
-      color: #777;
-      font-size: 0.9rem;
+      margin-top: -5%;
+      margin-bottom: 5px;
     }
+
+    .page-header h1 {
+      font-size: 40px;
+    }
+
+    .page-header p {
+      font-size: 20px;
+    }
+    
+    /*back button*/
+    .back-btn-container {
+      padding: 20px;
+      text-align: left;
+    }
+
+    .back-btn {
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #8b0013;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .back-btn:hover {
+      background-color: #a8001a;
+    }
+
+    .back-btn i {
+      margin-right: 8px;
+    }
+
+    /* FOOTER */
+  footer {
+    background-color: #8b0013;
+    color: white;
+    text-align: center;
+    font-size: 13px;
+    padding: 15px;
+    margin-top: 30px;
+  }
   </style>
 </head>
 <body>
-  <header>
-    <img src="../HaruBayan-admin/imgs/logo-harubayan.png" alt="Harubayan Logo" style="height: 40px; vertical-align: middle; border-radius: 50%;">
-    <span style="margin-left: 10px; font-size: 1.5rem;">HaruBayan Recipe Admin</span>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo-container">
+      <img src="../../imgs/logo-harubayan.png" alt="Logo" class="nav-logo">
+      <div>
+        <div class="nav-brand">Haru-Bayan</div>
+      </div>
+    </div>
+    
+    <div class="nav-center">Admin Portal</div>
+
+    <div class="nav-right">
+      <div class="user-menu">
+        <!-- User icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="user-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14c3.866 0 7 2.686 7 6H5c0-3.314 3.134-6 7-6zm0-2c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+        </svg>
+
+        <div class="dropdown">
+          <a href="../authentication/adminLOGIN.html" id="logout-btn">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Back Button -->
+<div class="back-btn-container">
+  <a href="../AdminRecipeChoice.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back </a>
+</div>
+
+
+  <header class="page-header">
+    <h1>Recipe Management</h1>
+    <p>Manage your recipes by adding, editing, or deleting them.</p>
   </header>
 
   <main>
@@ -114,7 +282,7 @@
   </main>
 
   <footer>
-    &copy; 2025 Haru Bayan • Powered by MyTech Corp
+    Copyright © 2025 Haru-Bayan. Created by MyTech Corp.
   </footer>
 
   <script>
@@ -243,6 +411,29 @@
     }
 
     loadRecipes();
+
+    // Toggle dropdown
+    const userIcon = document.querySelector('.user-icon');
+    const dropdown = document.querySelector('.dropdown');
+
+    userIcon.addEventListener('click', () => {
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-menu')) {
+
+        dropdown.style.display = 'none';
+      }
+    });
+  
+    // Logout functionality
+    document.getElementById("logout-btn").addEventListener("click", function () {
+  console.log("Redirecting...");
+  window.location.href = "./adminLOGIN.html";
+});
+
   </script>
 </body>
 </html>
