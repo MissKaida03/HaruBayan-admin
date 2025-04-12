@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HaruBayan - Admin Dashboard</title>
   <link rel="icon" type="image/png" href="../imgs/logo-harubayan.png"/>
+  
+  <!-- Font Awesome CDN for icons -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -12,8 +14,9 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
-  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="dashboard.css" />
 
+  <!-- Sakura animation styles -->
   <style>
     .sakura {
       position: absolute;
@@ -23,7 +26,8 @@
       background-image: url('../imgs/sakura.png');
       background-size: cover;
       animation: fall linear infinite;
-      z-index: 0;
+      pointer-events: none;
+      z-index: 1;
     }
 
     @keyframes fall {
@@ -39,10 +43,12 @@
 
     .sakura:nth-child(odd) {
       animation-duration: 8s;
+      animation-delay: 2s;
     }
 
     .sakura:nth-child(even) {
       animation-duration: 6s;
+      animation-delay: 4s;
     }
   </style>
 </head>
@@ -51,17 +57,21 @@
   <!-- NAVBAR -->
   <div class="navbar">
     <div class="logo-container">
-      <img src="../imgs/logo-harubayan.png" alt="Logo" class="nav-logo" />
+      <img src="../imgs/logo-harubayan.png" alt="Logo" class="nav-logo">
       <div>
         <div class="nav-brand">Haru-Bayan</div>
       </div>
     </div>
+    
     <div class="nav-center">Admin Portal</div>
+
     <div class="nav-right">
       <div class="user-menu">
+        <!-- User icon -->
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="user-icon">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14c3.866 0 7 2.686 7 6H5c0-3.314 3.134-6 7-6zm0-2c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
         </svg>
+
         <div class="dropdown">
           <a href="../authentication/adminLOGIN.html" id="logout-btn">Logout</a>
         </div>
@@ -75,15 +85,17 @@
     <div class="datetime" id="datetime"></div>
 
     <div class="buttons">
-      <a href="../recipe-section/AdminRecipeChoice.html">
-        <button class="btn">RECIPE MANAGEMENT<small>View and Manage all recipe entries</small></button>
-      </a>
-      <a href="../order-section/orders.html">
-        <button class="btn">ORDER MANAGEMENT<small>View all customer orders</small></button>
-      </a>
-      <a href="../MenuManagement/menu.html">
-        <button class="btn">MENU MANAGEMENT <small>Manage the items in the restaurant menu</small></button>
-      </a>
+        <a href="../recipe-section/AdminRecipeChoice.html">
+            <button class="btn">RECIPE MANAGEMENT<small>View and Manage all recipe entries</small></button>
+        </a>
+        
+        <a href="../order-section/orders.html">
+            <button class="btn">ORDER MANAGEMENT<small>View all customer orders</small></button>
+        </a>
+
+        <a href="menu.html">
+            <button class="btn">MENU MANAGEMENT <small>Manage the items in the restaurant menu</small></button>
+        </a>
     </div>
   </div>
 
@@ -93,9 +105,12 @@
   </footer>
 
   <!-- JS FUNCTIONALITY -->
+  <script src="dashboard.js"></script>
+
+  <!-- Sakura Animation Script -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 20; i++) {
         const sakura = document.createElement("div");
         sakura.className = "sakura";
         sakura.style.left = Math.random() * 100 + "vw";
