@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menu Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffe6f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .back-button, .next-button {
+      position: absolute;
+      padding: 10px 15px;
+      background-color: #8b0013;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .back-button {
+      top: 20px;
+      left: 20px;
+    }
+
+    .back-button:hover, .next-button:hover {
+      background-color: #f3eef0;
+      color: black;
+    }
+
+    .next-button {
+      bottom: 20px;
+      right: 20px;
+    }
+
+    .container {
+      width: 50%;
+      max-width: 800px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .add-item, .menu-list {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .price-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    .peso-sign {
+      font-size: 14px;
+      margin-right: 5px;
+    }
+
+    input, select, textarea {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+
+    input[type="number"] {
+      width: 100px;
+    }
+
+    textarea {
+      height: 80px;
+      resize: none;
+    }
+
+    select {
+      width: 200px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #8b0013;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #a40017;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .menu-item p {
+      margin: 0;
+    }
+
+    .menu-item button {
+      background-color: #dc3545;
+      border: none;
+      padding: 5px 10px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .menu-item button:hover {
+      background-color: #c82333;
+    }
+
+    .sakura {
+      position: absolute;
+      top: -50px;
+      width: 30px;
+      height: 30px;
+      background-image: url('../imgs/sakura.png');
+      background-size: cover;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateX(0) rotate(0);
+        top: -50px;
+      }
+      100% {
+        transform: translateX(200px) rotate(360deg);
+        top: 100vh;
+      }
+    }
+
+    .sakura:nth-child(odd) {
+      animation-duration: 8s;
+      animation-delay: 2s;
+    }
+
+    .sakura:nth-child(even) {
+      animation-duration: 6s;
+      animation-delay: 4s;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-button" href="dashboard.html">← Back</a>
+
+  <div class="container">
+    <h1>Menu Management</h1>
+
+    <div class="add-item">
+      <h2>Add New Menu Item</h2>
+      <form id="addMenuItemForm">
+        <input type="text" id="itemName" placeholder="Item Name" required />
+        <textarea id="itemDescription" placeholder="Item Description" required></textarea>
+        <div class="price-wrapper">
+          <span class="peso-sign">₱</span>
+          <input type="number" id="itemPrice" placeholder="Price" required />
+        </div>
+        <label for="category">Category</label>
+        <select id="category" required>
+          <option value="Main Dish">Main Dish</option>
+          <option value="Noodles">Noodles</option>
+          <option value="Rice Dishes">Rice Dishes</option>
+          <option value="Soups & Stews">Soups & Stews</option>
+          <option value="Side Dishes">Side Dishes</option>
+          <option value="Appetizers">Appetizers</option>
+          <option value="Street Food & Snacks">Street Food & Snacks</option>
+          <option value="Desserts & Sweets">Desserts & Sweets</option>
+          <option value="Beverages">Beverages</option>
+        </select>
+        <label for="itemImage">Upload Image</label>
+        <input type="file" id="itemImage" accept="image/*" />
+        <button type="submit">Add Item</button>
+      </form>
+    </div>
+
+    <div id="successMessage" style="display: none; color: green; text-align: center; margin-top: 20px;">
+      Item successfully added!
+    </div>
+  </div>
+
+  <a class="next-button" href="nextPage.html">Menu →</a>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      for (let i = 0; i < 20; i++) {
+        const sakura = document.createElement("div");
+        sakura.className = "sakura";
+        sakura.style.left = Math.random() * 100 + "vw";
+        sakura.style.animationDelay = Math.random() * 5 + "s";
+        document.body.appendChild(sakura);
+      }
+
+      const addMenuItemForm = document.getElementById("addMenuItemForm");
+      const itemName = document.getElementById("itemName");
+      const itemDescription = document.getElementById("itemDescription");
+      const itemPrice = document.getElementById("itemPrice");
+      const category = document.getElementById("category");
+      const itemImage = document.getElementById("itemImage");
+      const successMessage = document.getElementById("successMessage");
+
+      addMenuItemForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+
+        // Create an object to hold menu item details
+        const newItem = {
+          name: itemName.value,
+          description: itemDescription.value,
+          price: parseFloat(itemPrice.value).toFixed(2),
+          category: category.value
+        };
+
+        // Check if an image was uploaded
+        if (itemImage.files.length > 0) {
+          // Get the image file
+          const imageFile = itemImage.files[0];
+          // Create a URL for the image file
+          const imageUrl = URL.createObjectURL(imageFile);
+          newItem.imageUrl = imageUrl; // Add the image URL to the item
+        }
+
+        // Save the new menu item to localStorage
+        menuItems.push(newItem);
+        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+
+        // Clear the form
+        itemName.value = "";
+        itemDescription.value = "";
+        itemPrice.value = "";
+        category.selectedIndex = 0;
+        itemImage.value = ""; // Reset image input
+
+        // Show success message
+        successMessage.style.display = "block";
+
+        // Hide the success message after 2 seconds
+        setTimeout(() => {
+          successMessage.style.display = "none";
+        }, 2000);
+      });
+    });
+  </script>
+  
+</body>
+</html>

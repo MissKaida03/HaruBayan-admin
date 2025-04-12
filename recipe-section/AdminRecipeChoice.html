@@ -67,6 +67,7 @@
     body {
       background: #fff;
       color: #333;
+      position: relative;
     }
 
     /* NAVBAR */
@@ -224,7 +225,6 @@
     }
     .overlay:hover{
         background-color: #a8001a;
-
     }
 
     /* === FOOTER === */
@@ -261,30 +261,53 @@
     .back-btn i {
       margin-right: 8px;
     }
+
+    /* === FALLING SAKURA === */
+    .sakura {
+      position: absolute;
+      top: -50px;
+      width: 30px;
+      height: 30px;
+      background-image: url('../imgs/sakura.png');
+      background-size: cover;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateX(0) rotate(0);
+        top: -50px;
+      }
+      100% {
+        transform: translateX(200px) rotate(360deg);
+        top: 100vh;
+      }
+    }
+
+    .sakura:nth-child(odd) {
+      animation-duration: 8s;
+      animation-delay: 2s;
+    }
+
+    .sakura:nth-child(even) {
+      animation-duration: 6s;
+      animation-delay: 4s;
+    }
   </style>
 
   <script>
-    // Toggle dropdown
-    const userIcon = document.querySelector('.user-icon');
-    const dropdown = document.querySelector('.dropdown');
-
-    userIcon.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.user-menu')) {
-        dropdown.style.display = 'none';
+    // Generate sakura petals
+    document.addEventListener("DOMContentLoaded", function () {
+      for (let i = 0; i < 20; i++) {
+        const sakura = document.createElement("div");
+        sakura.className = "sakura";
+        sakura.style.left = Math.random() * 100 + "vw";
+        sakura.style.animationDelay = Math.random() * 5 + "s";
+        document.body.appendChild(sakura);
       }
-    });
+    })
 
-    // Logout functionality
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      // Clear session or perform any other logout actions here
-      window.location.href = "./adminLOGIN.html"; // Redirect to login page
-    });
+    generateSakura();
   </script>
-
 </body>
 </html>
