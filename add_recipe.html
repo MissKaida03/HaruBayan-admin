@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recipe Admin Panel</title>
+  <link rel="icon" type="image/png" href="../HaruBayan-admin/imgs/logo-harubayan.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fff0f3;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #8b0013;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      padding: 30px;
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #8b0013;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b6001f;
+    }
+    .recipe-card {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+    img.recipe-img {
+      max-width: 100px;
+      border-radius: 8px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #777;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../HaruBayan-admin/imgs/logo-harubayan.png" alt="Harubayan Logo" style="height: 40px; vertical-align: middle; border-radius: 50%;">
+    <span style="margin-left: 10px; font-size: 1.5rem;">HaruBayan Recipe Admin</span>
+  </header>
+
+  <main>
+    <h2 id="form-title">Add New Recipe</h2>
+    <form id="recipe-form">
+      <input type="hidden" id="recipe-id">
+      <label for="name">Recipe Name</label>
+      <input type="text" id="name" required>
+
+      <label for="category">Category</label>
+      <select id="category" required>
+        <option>Main Dish</option>
+        <option>Noodles</option>
+        <option>Rice Dishes</option>
+        <option>Soups & Stews</option>
+        <option>Side Dishes</option>
+        <option>Appetizers</option>
+        <option>Street Food & Snacks</option>
+        <option>Desserts & Sweets</option>
+        <option>Beverages</option>
+      </select>
+
+      <label for="description">Description</label>
+      <textarea id="description" rows="4" required></textarea>
+
+      <label for="image">Upload Image</label>
+      <input type="file" id="image" accept="image/*">
+
+      <button type="submit">Save Recipe</button>
+    </form>
+    <p id="status"></p>
+
+    <h3>Existing Recipes</h3>
+    <div id="recipes-list"></div>
+  </main>
+
+  <footer>
+    &copy; 2025 Haru Bayan • Powered by MyTech Corp
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://lngdoqimxolarajflobo.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic'; // Replace with actual key
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('recipe-form');
+    const status = document.getElementById('status');
+    const recipesList = document.getElementById('recipes-list');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = 'Processing...';
+
+      const id = document.getElementById('recipe-id').value;
+      const name = document.getElementById('name').value;
+      const category = document.getElementById('category').value;
+      const description = document.getElementById('description').value;
+      const imageFile = document.getElementById('image').files[0];
+      let image_url = null;
+
+      try {
+        if (imageFile) {
+          const fileExt = imageFile.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
+          const filePath = `recipes/${fileName}`;
+
+          const { error: uploadError } = await client.storage
+            .from('recipe-images')
+            .upload(filePath, imageFile);
+
+          if (uploadError) throw uploadError;
+
+          const { data: urlData } = await client.storage
+            .from('recipe-images')
+            .getPublicUrl(filePath);
+
+          image_url = urlData.publicUrl;
+        }
+
+        if (id) {
+          // Update existing
+          const { data: oldData } = await client.from('recipes').select('image_url').eq('id', id).single();
+          if (image_url && oldData?.image_url) {
+            const oldPath = oldData.image_url.split('/').slice(-2).join('/');
+            await client.storage.from('recipe-images').remove([oldPath]);
+          }
+
+          const { error: updateError } = await client
+            .from('recipes')
+            .update({ name, category, description, ...(image_url && { image_url }) })
+            .eq('id', id);
+
+          if (updateError) throw updateError;
+
+          status.textContent = 'Recipe updated!';
+        } else {
+          const { error: insertError } = await client
+            .from('recipes')
+            .insert([{ name, category, description, image_url }]);
+
+          if (insertError) throw insertError;
+
+          status.textContent = 'Recipe added!';
+        }
+
+        form.reset();
+        document.getElementById('recipe-id').value = '';
+        document.getElementById('form-title').textContent = 'Add New Recipe';
+        loadRecipes();
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Error: ' + err.message;
+      }
+    });
+
+    async function loadRecipes() {
+      const { data, error } = await client
+        .from('recipes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading:', error);
+        return;
+      }
+
+      recipesList.innerHTML = '';
+      data.forEach(recipe => {
+        const div = document.createElement('div');
+        div.className = 'recipe-card';
+        div.innerHTML = `
+          <strong>${recipe.name}</strong> (${recipe.category})<br>
+          <img class="recipe-img" src="${recipe.image_url}" alt="${recipe.name}" /><br>
+          <em>${recipe.description}</em><br>
+          <small>Created: ${new Date(recipe.created_at).toLocaleString()}</small><br>
+          <button onclick="editRecipe(${recipe.id})">Edit</button>
+          <button onclick="deleteRecipe(${recipe.id}, '${recipe.image_url}')">Delete</button>
+        `;
+        recipesList.appendChild(div);
+      });
+    }
+
+    async function editRecipe(id) {
+      const { data, error } = await client.from('recipes').select('*').eq('id', id).single();
+      if (error) return alert('Error fetching recipe');
+
+      document.getElementById('recipe-id').value = data.id;
+      document.getElementById('name').value = data.name;
+      document.getElementById('category').value = data.category;
+      document.getElementById('description').value = data.description;
+      document.getElementById('form-title').textContent = 'Edit Recipe';
+    }
+
+    async function deleteRecipe(id, image_url) {
+      if (!confirm('Are you sure?')) return;
+
+      const { error } = await client.from('recipes').delete().eq('id', id);
+      if (error) return alert('Failed to delete');
+
+      const path = image_url.split('/').slice(-2).join('/');
+      await client.storage.from('recipe-images').remove([path]);
+
+      loadRecipes();
+    }
+
+    loadRecipes();
+  </script>
+</body>
+</html>
