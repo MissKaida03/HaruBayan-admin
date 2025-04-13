@@ -1,200 +1,204 @@
-const SUPABASE_URL = 'https://lngdoqimxolarajflobo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic'; // Replace with actual key
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Supabase v2 client
+const client = supabase.createClient(
+  'https://lngdoqimxolarajflobo.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic'
+);
 
-const form = document.getElementById('recipe-form');
-const status = document.getElementById('status');
-const recipesList = document.getElementById('recipes-list');
-const searchBar = document.getElementById('search-bar');
-const sortCategory = document.getElementById('sort-category');
+// On page load
+document.addEventListener('DOMContentLoaded', () => {
+  fetchRecipes();
 
-// Handle form submission (Add or Update Recipe)
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  status.textContent = 'Processing...';
+  document.getElementById('recipe-form').addEventListener('submit', handleSubmit);
+  document.getElementById('search-bar').addEventListener('input', filterRecipes);
+  document.getElementById('sort-category').addEventListener('change', filterRecipes);
+});
+
+// Handle form submit
+async function handleSubmit(event) {
+  event.preventDefault();
 
   const id = document.getElementById('recipe-id').value;
-  const name = document.getElementById('name').value;
+  const name = document.getElementById('name').value.trim();
   const category = document.getElementById('category').value;
-  const description = document.getElementById('description').value;
-  const imageFile = document.getElementById('image').files[0];
-  let image_url = null;
+  const description = document.getElementById('description').value.trim();
+  const originalFile = document.getElementById('image').files[0];
 
-  try {
-    if (imageFile) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `recipes/${fileName}`;
+  let imageUrl;
 
-      const { error: uploadError } = await client.storage
-        .from('recipe-images')
-        .upload(filePath, imageFile);
+  // If an image is uploaded, handle the upload
+  if (originalFile) {
+    const fileExt = originalFile.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `recipes/${fileName}`;
 
-      if (uploadError) throw uploadError;
+    // Change the bucket name here to match your actual bucket name
+    const { error: uploadError } = await client.storage
+      .from('recipe-images') // Use your actual bucket name here
+      .upload(filePath, originalFile, {
+        cacheControl: '3600',
+        upsert: false,
+      });
 
-      const { data: urlData } = await client.storage
-        .from('recipe-images')
-        .getPublicUrl(filePath);
-
-      image_url = urlData.publicUrl;
+    if (uploadError) {
+      return alert('Image upload failed!');
     }
 
-    if (id) {
-      // Update existing recipe
-      const { data: oldData } = await client.from('recipes').select('image_url').eq('id', id).single();
-      if (image_url && oldData?.image_url) {
-        const oldPath = oldData.image_url.split('/').slice(-2).join('/');
-        await client.storage.from('recipe-images').remove([oldPath]);
-      }
+    const { data: publicUrlData } = await client.storage
+      .from('recipe-images') // Use your actual bucket name here
+      .getPublicUrl(filePath);
 
-      const { error: updateError } = await client
+    imageUrl = publicUrlData.publicUrl;
+  } else {
+    // If no new image is uploaded, fetch the current image URL
+    const { data: existingData } = await client
+      .from('recipes')
+      .select('image_url')
+      .eq('id', id);
+
+    imageUrl = existingData?.[0]?.image_url;
+  }
+
+  let response;
+  if (id) {
+    // If editing, optionally delete old image if a new one is uploaded
+    if (originalFile && imageUrl) {
+      const { data: oldDataArray } = await client
         .from('recipes')
-        .update({ name, category, description, ...(image_url && { image_url }) })
+        .select('image_url')
         .eq('id', id);
 
-      if (updateError) throw updateError;
-
-      status.textContent = 'Recipe updated!';
-    } else {
-      // Add new recipe
-      const { error: insertError } = await client
-        .from('recipes')
-        .insert([{ name, category, description, image_url }]);
-
-      if (insertError) throw insertError;
-
-      status.textContent = 'Recipe added!';
+      const oldImageUrl = oldDataArray?.[0]?.image_url;
+      if (oldImageUrl) {
+        const imagePath = oldImageUrl.split('/').slice(-2).join('/');
+        await client.storage.from('recipe-images').remove([imagePath]); // Update bucket name here as well
+      }
     }
 
-    form.reset();
-    document.getElementById('recipe-id').value = '';
-    document.getElementById('form-title').textContent = 'Add New Recipe';
-    loadRecipes(); // Reload recipes after adding or updating
-  } catch (err) {
-    console.error(err);
-    status.textContent = 'Error: ' + err.message;
-  }
-});
-
-// Load existing recipes when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  loadRecipes(); // Load recipes when the page loads
-});
-
-// Load recipes from Supabase with search and category filter
-async function loadRecipes() {
-  const searchQuery = searchBar.value.toLowerCase();
-  const selectedCategory = sortCategory.value;
-
-  let query = client.from('recipes').select('*').order('created_at', { ascending: false });
-
-  // Apply search filter by name
-  if (searchQuery) {
-    query = query.ilike('name', `%${searchQuery}%`);
+    // Update recipe (with manually set updated_at)
+    response = await client
+      .from('recipes')
+      .update({
+        name,
+        category,
+        description,
+        ...(imageUrl && { image_url: imageUrl }), // Only update image_url if a new image is uploaded
+        updated_at: new Date().toISOString(), // Ensure updated_at is set
+      })
+      .eq('id', id);
+  } else {
+    // Insert new recipe if no ID exists
+    response = await client
+      .from('recipes')
+      .insert({
+        name,
+        category,
+        description,
+        image_url: imageUrl,
+        created_at: new Date().toISOString(),
+      });
   }
 
-  // Apply sort filter by category
-  if (selectedCategory) {
-    query = query.eq('category', selectedCategory);
+  if (response.error) {
+    console.error(response.error);
+    return alert('Failed to save recipe!');
   }
 
-  const { data, error } = await query;
+  document.getElementById('recipe-form').reset();
+  document.getElementById('form-title').textContent = 'Add New Recipe';
+  document.getElementById('status').textContent = 'Recipe saved successfully!';
+  fetchRecipes();
+}
+
+// Fetch and display recipes
+async function fetchRecipes() {
+  const { data, error } = await client.from('recipes').select('*').order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error loading:', error);
+    console.error(error);
     return;
   }
 
-  recipesList.innerHTML = ''; // Clear the existing list
+  const container = document.getElementById('recipes-list');
+  container.innerHTML = '';
+
   data.forEach(recipe => {
-    const div = document.createElement('div');
-    div.className = 'recipe-card';
-    div.innerHTML = `
-      <strong>${recipe.name}</strong> (${recipe.category})<br>
-      <img class="recipe-img" src="${recipe.image_url}" alt="${recipe.name}" /><br>
-      <em>${recipe.description}</em><br>
-      <small>Created: ${new Date(recipe.created_at).toLocaleString()}</small><br>
-      <button onclick="editRecipe(${recipe.id})">Edit</button>
-      <button onclick="deleteRecipe(${recipe.id}, '${recipe.image_url}')">Delete</button>
+    const card = document.createElement('div');
+    card.className = 'recipe-card';
+
+    card.innerHTML = `
+      <img src="${recipe.image_url || '../../imgs/default.jpg'}" alt="${recipe.name}">
+      <div class="recipe-info">
+        <h4>${recipe.name}</h4>
+        <p>${recipe.category}</p>
+        <p>${recipe.description}</p>  <!-- Show description here -->
+        <div class="btn-group">
+          <button onclick="editRecipe('${recipe.id}')"><i class="fas fa-edit"></i></button>
+          <button onclick="deleteRecipe('${recipe.id}')"><i class="fas fa-trash-alt"></i></button>
+        </div>
+      </div>
     `;
-    recipesList.appendChild(div);
+
+    container.appendChild(card);
   });
 }
 
-// Event listener for search input
-searchBar.addEventListener('input', () => {
-  loadRecipes(); // Reload recipes with updated search filter
-});
+// Filter recipes
+function filterRecipes() {
+  const search = document.getElementById('search-bar').value.toLowerCase();
+  const category = document.getElementById('sort-category').value;
 
-// Event listener for category sort dropdown
-sortCategory.addEventListener('change', () => {
-  loadRecipes(); // Reload recipes with updated sort filter
-});
+  const cards = document.querySelectorAll('.recipe-card');
 
-async function editRecipe(id) {
-  // Display a confirmation prompt directly in the form
-  const confirmEdit = confirm("Are you sure you want to edit this recipe?");
-  
-  if (confirmEdit) {
-    // Fetch the recipe data
-    const { data, error } = await client.from('recipes').select('*').eq('id', id).single();
-    if (error) return alert('Error fetching recipe');
-  
-    // Populate the form with the recipe data
-    document.getElementById('recipe-id').value = data.id;
-    document.getElementById('name').value = data.name;
-    document.getElementById('category').value = data.category;
-    document.getElementById('description').value = data.description;
-    document.getElementById('form-title').textContent = 'Edit Recipe';
-  } else {
-    // If user cancels, do nothing
-    return;
-  }
+  cards.forEach(card => {
+    const name = card.querySelector('h4').textContent.toLowerCase();
+    const cat = card.querySelector('p').textContent;
+
+    const matchName = name.includes(search);
+    const matchCategory = !category || cat === category;
+
+    card.style.display = matchName && matchCategory ? 'block' : 'none';
+  });
 }
 
-  
+// Edit recipe
+async function editRecipe(id) {
+  const confirmEdit = confirm("Are you sure you want to edit this recipe?");
+  if (!confirmEdit) return;
 
-/// Delete recipe function
-async function deleteRecipe(id, image_url) {
-    // Ask for confirmation before deleting
-    if (!confirm('Are you sure you want to delete this recipe?')) return;
-  
-    // Delete recipe record from the database
-    const { error } = await client.from('recipes').delete().eq('id', id);
-    if (error) return alert('Failed to delete recipe');  // Show error if deletion fails
-  
-    // If the recipe has an image URL, delete the image from Supabase storage
-    if (image_url) {
-      const path = image_url.split('/').slice(-2).join('/');  // Extract the file path from the URL
-      await client.storage.from('recipe-images').remove([path]);  // Remove the image file from Supabase storage
-    }
-  
-    // Reload the recipe list after deletion
-    loadRecipes();
+  const { data, error } = await client.from('recipes').select('*').eq('id', id);
+
+  if (error || !data || data.length === 0) {
+    return alert('Error fetching recipe');
   }
 
-  // Attach functions to global scope so they work in onclick
-window.editRecipe = editRecipe;
-window.deleteRecipe = deleteRecipe;
+  const recipe = data[0];
 
-  
-// Toggle dropdown menu
-const userIcon = document.querySelector('.user-icon');
-const dropdown = document.querySelector('.dropdown');
+  document.getElementById('recipe-id').value = recipe.id;
+  document.getElementById('name').value = recipe.name;
+  document.getElementById('category').value = recipe.category;
+  document.getElementById('description').value = recipe.description; // Add description to the form
+  document.getElementById('form-title').textContent = 'Edit Recipe';
+}
 
-userIcon.addEventListener('click', () => {
-  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-});
+// Delete recipe
+async function deleteRecipe(id) {
+  const confirmDelete = confirm("Are you sure you want to delete this recipe?");
+  if (!confirmDelete) return;
 
-// Close dropdown on outside click
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.user-menu')) {
-    dropdown.style.display = 'none';
+  const { data } = await client.from('recipes').select('image_url').eq('id', id);
+  const imageUrl = data?.[0]?.image_url;
+
+  if (imageUrl) {
+    const imagePath = imageUrl.split('/').slice(-2).join('/');
+    await client.storage.from('recipe-images').remove([imagePath]); // Update bucket name here as well
   }
-});
 
-// Logout functionality
-document.getElementById("logout-btn").addEventListener("click", function () {
-  console.log("Redirecting...");
-  window.location.href = "../../authentication/adminLOGIN.html";
-});
+  const { error } = await client.from('recipes').delete().eq('id', id);
+
+  if (error) {
+    console.error(error);
+    return alert('Failed to delete recipe');
+  }
+
+  fetchRecipes();
+}
