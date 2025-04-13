@@ -1,247 +1,787 @@
-<!DOCTYPE html>
+<!--HTML -->
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Menu Management</title>
+  <title>Admin - Menu Management</title>
   <link rel="icon" type="image/png" href="../imgs/logo-harubayan.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo-container">
+      <img src="../imgs/logo-harubayan.png" alt="Logo" class="nav-logo">
+      <div>
+        <div class="nav-brand">Haru-Bayan</div>
+      </div>
+    </div>
+    
+    <div class="nav-center">Admin Portal</div>
+
+    <div class="nav-right">
+      <div class="user-menu">
+        <!-- User icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="user-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14c3.866 0 7 2.686 7 6H5c0-3.314 3.134-6 7-6zm0-2c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+        </svg>
+
+        <div class="dropdown">
+          <a href="../authentication/adminLOGIN.html" id="logout-btn">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="back-btn-container">
+    <a href="../dashboard/dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back </a>
+  </div>
+
+  <header class="page-header">
+    <h1>Menu Management</h1>
+    <p>Manage your menu by adding, editing, or deleting them.</p>
+  </header>
+
+  <!--MAIN-->
+  <body>
+
+    <div class="content-container">
+        <!-- Left: Menu List -->
+        <div class="menu-list-container">
+            <div class="menu-header">
+              <h2>Menu List</h2>
+              <div class="menu-controls">
+                <input type="text" id="search-input" placeholder="Search by name..." />
+                <select id="category-filter">
+                    <option value="">Sort by Category</option>
+                    <option>Main Dish</option>
+                    <option>Noodles</option>
+                    <option>Rice Dishes</option>
+                    <option>Soups & Stews</option>
+                    <option>Side Dishes</option>
+                    <option>Appetizers</option>
+                    <option>Street Food & Snacks</option>
+                    <option>Desserts & Sweets</option>
+                    <option>Beverages</option>
+                </select>
+              </div>
+            </div>
+          
+            <div id="menu-list"></div>
+          </div>
+          
+      
+        <!-- Right: Menu Form -->
+        <div class="menu-form-container">
+         
+          <form id="menu-form">
+            <div>
+                <h2 id="form-title">Add Menu from Existing Recipes</h2>
+              <label for="recipe-select">Select Recipe:</label>
+              <select id="recipe-select" required>
+                <option value="">--Select Recipe--</option>
+              </select>
+            </div>
+            <div>
+              <label for="name">Recipe Name:</label>
+              <input type="text" id="name" readonly />
+            </div>
+            <div>
+              <label for="category">Category:</label>
+              <input type="text" id="category" readonly />
+            </div>
+            <div>
+              <label for="recipe-img">Recipe Image:</label>
+              <img id="recipe-img" width="100" alt="Recipe Image" />
+            </div>
+            <div>
+              <label for="price">Price:</label>
+              <input type="number" id="price" step="0.01" required />
+            </div>
+            <div>
+              <label for="description">Description:</label>
+              <textarea id="description" required></textarea>
+            </div>
+            <button type="submit">Save Menu</button>
+          </form>
+
+          <div id="status"></div>
+
+        </div>
+      </div>
+      
+  <!--footer-->
+  <footer>Copyright © 2025 Haru-Bayan. Created by MyTech Corp.</footer>    
+
+  <!--css-->
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #ffe6f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #fff0f3;
+    margin: 0;
+    padding: 0;
+}
+
+/* NAVBAR */
+.navbar {
+    background-color: #8b0013;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.navbar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.nav-logo {
+    height: 32px;
+    border-radius: 100%;
+}
+
+.nav-brand {
+    font-size: 16px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: bold;
+    color: white;
+}
+
+.nav-center {
+    text-align: center;
+    font-size: 25px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    color: white;
+    flex: 2;
+    margin-left: -50%;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-icon {
+    width: 23px;
+    height: 23px;
+    cursor: pointer;
+    color: white;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+    border: 1px solid #fff8f8;
+    border-radius: 100%;
+}
+
+.user-icon:hover {
+    background-color: #a8001a;
+    border: 1px solid #fff8f8;
+    border-radius: 100%;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    color: #8b0013;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-top: 10px;
+    z-index: 1;
+    border: 1px solid #8b0013;
+}
+
+.dropdown a {
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+    color: #8b0013;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.dropdown a:hover {
+    background-color: #ffdada;
+}
+
+/* === PAGE HEADER === */
+.page-header {
+    text-align: center;
+    margin-top: -5%;
+    margin-bottom: 5px;
+}
+
+.page-header h1 {
+    font-size: 40px;
+    margin-bottom: 2%;
+}
+
+.page-header p {
+    margin-top: -1%;
+    font-size: 20px;
+}
+
+
+/* Main container layout with responsive columns */
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 20px;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Left: Menu list container */
+.menu-list-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+  border: 2px solid #6b0202;
+  border-radius: 10px;
+  background-color: #f8fbff;
+  max-height: 900px;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sticky header for search + filter */
+.menu-header {
+  position: sticky;
+  top: 0;
+  background-color: #f8fbff;
+  z-index: 10;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Search bar and category filter in one row */
+.menu-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: nowrap;
+}
+
+.menu-controls input,
+.menu-controls select {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  background-color: #6b0202;
+  color: #fff8f8;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.menu-controls input::placeholder {
+    color: white
+  }
+
+
+.menu-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+
+/* Container for the actual list of items */
+#menu-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 columns */
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Style for individual menu items */
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  height: 320px; /* fixed height */
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.menu-item img {
+  width: 100%;
+  height: 150px; /* fixed image height */
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+
+.menu-item-details {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.actions {
+  margin-top: 10px;
+}
+
+button {
+  margin: 5px;
+}
+
+
+
+/* Right: Menu form styling */
+.menu-form-container {
+    flex: 1; /* Flexible width */
+    min-width: 300px; /* Ensure minimum width */
+    max-width: 500px; /* Ensure max width */
+    border: 2px solid #6b0202;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f0d1d1;
+}
+
+/* Status message */
+#status {
+    text-align: center;
+    font-size: 18px;
+    color: #8b0013;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+}
+
+/* Form labels */
+form label {
+    font-weight: 600;
+    margin-top: 15px;
+    display: block;
+}
+
+/* Form inputs, selects, and textareas */
+form input,
+form textarea,
+form select {
+    padding: 10px;
+    font-size: 1rem;
+    width: 95%;
+    border: 1px solid #6b0202;
+    border-radius: 8px;
+    margin-top: 5px;
+}
+
+#form-title{
+    margin-top: 0%;
+}
+
+/*back button*/
+.back-btn-container {
+      padding: 20px;
+      text-align: left;
     }
-    .back-button, .next-button {
-      position: absolute;
+  
+    .back-btn {
+      display: inline-block;
       padding: 10px 15px;
       background-color: #8b0013;
       color: white;
       text-decoration: none;
+      font-size: 16px;
       border-radius: 5px;
-      font-size: 14px;
-      cursor: pointer;
+      transition: background-color 0.3s;
     }
-    .back-button { top: 20px; left: 20px; }
-    .back-button:hover, .next-button:hover {
-      background-color: #f3eef0;
-      color: black;
+  
+    .back-btn:hover {
+      background-color: #a8001a;
     }
-    .next-button { bottom: 20px; right: 20px; }
-    .container {
-      width: 50%;
-      max-width: 800px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      position: relative;
-      z-index: 10;
+  
+    .back-btn i {
+      margin-right: 8px;
     }
-    h1 { text-align: center; margin-bottom: 20px; }
-    .add-item, .menu-list { margin-bottom: 40px; }
-    h2 { margin-bottom: 10px; }
-    form { display: flex; flex-direction: column; }
-    .price-wrapper {
-      display: flex;
-      align-items: center;
-    }
-    .peso-sign {
-      font-size: 14px;
-      margin-right: 5px;
-    }
-    input, select, textarea {
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-      font-size: 14px;
-    }
-    input[type="number"] { width: 100px; }
-    select { width: 100%; }
-    button {
-      padding: 10px;
-      background-color: #8b0013;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover { background-color: #a40017; }
-    .sakura {
-      position: absolute;
-      top: -50px;
-      width: 30px;
-      height: 30px;
-      background-image: url('../imgs/sakura.png');
-      background-size: cover;
-      animation: fall linear infinite;
-    }
-    @keyframes fall {
-      0% { transform: translateX(0) rotate(0); top: -50px; }
-      100% { transform: translateX(200px) rotate(360deg); top: 100vh; }
-    }
-    .sakura:nth-child(odd) {
-      animation-duration: 8s;
-      animation-delay: 2s;
-    }
-    .sakura:nth-child(even) {
-      animation-duration: 6s;
-      animation-delay: 4s;
-    }
-  </style>
-</head>
-<body>
-  <a class="back-button" href="../dashboard/dashboard.html">← Back</a>
 
-  <div class="container">
-    <h1>Menu Management</h1>
+/* Submit button */
+button[type="submit"] {
+    background-color: #8b0013;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
-    <div class="add-item">
-      <h2>Add New Menu Item</h2>
-      <form id="addMenuItemForm">
-        <label for="recipeSelect">Select Recipe</label>
-        <select id="recipeSelect" required>
-          <option value="">Loading recipes...</option>
-        </select>
+button[type="submit"]:hover {
+    background-color: #b6001f;
+}
 
-        <label for="categorySelect">Select Category</label>
-        <select id="categorySelect" required>
-          <option value="">-- Choose Category --</option>
-          <option value="Appetizers">Appetizers</option>
-          <option value="Beverages">Beverages</option>
-          <option value="Desserts&Sweets">Desserts & Sweets</option>
-          <option value="main-dish">Main Dish</option>
-          <option value="noodles">Noodles</option>
-          <option value="RichDishes">Rich Dishes</option>
-          <option value="SideDishes">Side Dishes</option>
-          <option value="Soups&Stews">Soups & Stews</option>
-          <option value="StreetFood">Street Food</option>
-        </select>
+/* Recipe image preview */
+#recipe-img {
+    border-radius: 8px;
+    max-width: 100px;
+    margin-top: 5px;
+}
 
-        <div class="price-wrapper">
-          <span class="peso-sign">₱</span>
-          <input type="number" id="itemPrice" placeholder="Price" required />
-        </div>
+/* FOOTER */
+footer {
+    background-color: #8b0013;
+    color: white;
+    text-align: center;
+    font-size: 13px;
+    padding: 15px;
+    margin-top: 30px;
+}
 
-        <label for="itemImage">Upload Image</label>
-        <input type="file" id="itemImage" accept="image/*" required />
 
-        <button type="submit">Add Item</button>
-      </form>
-    </div>
+/* Make layout stack (column) on smaller screens */
+@media (max-width: 768px) {
+    .content-container {
+        flex-direction: column; /* Stack the columns */
+        gap: 20px;
+    }
 
-    <div id="successMessage" style="display: none; color: green; text-align: center; margin-top: 20px;">
-      Item successfully added!
-    </div>
-  </div>
+    .menu-list-container, .menu-form-container {
+        max-width: 100%; /* Ensure both columns fill available space */
+    }
+}
 
-  <a class="next-button" href="nextPage.html">Menu →</a>
+</style>
+  <!--js-->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+      const SUPABASE_URL = 'https://lngdoqimxolarajflobo.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic'; // Replace with actual key
+      const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+      const form = document.getElementById('menu-form');
+  const status = document.getElementById('status');
+  const recipeSelect = document.getElementById('recipe-select');
+  const nameField = document.getElementById('name');
+  const categoryField = document.getElementById('category');
+  const imageField = document.getElementById('recipe-img');
+  const priceField = document.getElementById('price');
+  const descriptionField = document.getElementById('description');
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script>
-    const supabaseUrl = 'https://lngdoqimxolarajflobo.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  // Load available recipes from Supabase
+  async function loadRecipes() {
+    const { data: recipes, error } = await client.from('recipes').select('*');
+    if (error) {
+      console.error('Error fetching recipes:', error);
+      return;
+    }
+    recipes.forEach(recipe => {
+      const option = document.createElement('option');
+      option.value = recipe.id;
+      option.textContent = recipe.name;
+      recipeSelect.appendChild(option);
+    });
+  }
 
-    document.addEventListener("DOMContentLoaded", async function () {
-      for (let i = 0; i < 20; i++) {
-        const sakura = document.createElement("div");
-        sakura.className = "sakura";
-        sakura.style.left = Math.random() * 100 + "vw";
-        sakura.style.animationDelay = Math.random() * 5 + "s";
-        document.body.appendChild(sakura);
+  // When a recipe is selected, populate the read-only fields (name, category, image)
+  recipeSelect.addEventListener('change', async () => {
+    const recipeId = recipeSelect.value;
+    if (recipeId) {
+      const { data: recipe, error } = await client.from('recipes').select('*').eq('id', recipeId).single();
+      if (error) {
+        console.error('Error fetching recipe:', error);
+        return;
+      }
+      nameField.value = recipe.name;
+      categoryField.value = recipe.category;
+      imageField.src = recipe.image_url;
+      priceField.value = '';
+      descriptionField.value = '';
+    }
+  });
+
+  // Submit logic: either update an existing item or create a new one
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const recipeId = recipeSelect.value;
+    const price = priceField.value;
+    const description = descriptionField.value;
+
+    if (!recipeId || !price || !description) {
+      status.textContent = 'All fields are required!';
+      return;
+    }
+
+    status.textContent = 'Saving...';
+
+    try {
+      // Check if the menu item already exists
+      const { data: existing, error: fetchError } = await client
+        .from('menu')
+        .select('id')
+        .eq('recipe_id', recipeId)
+        .single();
+
+      // Handle errors while fetching existing record
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        status.textContent = 'Error checking existing menu: ' + fetchError.message;
+        return;
       }
 
-      const recipeSelect = document.getElementById("recipeSelect");
-      const categorySelect = document.getElementById("categorySelect");
-      const addMenuItemForm = document.getElementById("addMenuItemForm");
-      const itemPrice = document.getElementById("itemPrice");
-      const itemImage = document.getElementById("itemImage");
-      const successMessage = document.getElementById("successMessage");
+      // If an existing menu item is found, update it
+      if (existing) {
+        const { error } = await client
+          .from('menu')
+          .update({
+            price: parseFloat(price),
+            description: description
+          })
+          .eq('id', existing.id);
 
-      // Load recipes from Supabase
-      async function loadRecipes() {
-        const { data, error } = await supabase.from('recipes').select('id, name');
-        if (error) {
-          recipeSelect.innerHTML = `<option value="">Failed to load recipes</option>`;
-          console.error("Error loading recipes:", error);
-        } else {
-          recipeSelect.innerHTML = '<option value="">Select a recipe</option>';
-          data.forEach(recipe => {
-            const option = document.createElement("option");
-            option.value = recipe.id;
-            option.textContent = recipe.name;
-            recipeSelect.appendChild(option);
-          });
-        }
-      }
+        if (error) throw error;
 
-      await loadRecipes();
-
-      addMenuItemForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const recipeId = recipeSelect.value;
-        const price = parseFloat(itemPrice.value).toFixed(2);
-        const imageFile = itemImage.files[0];
-        const category = categorySelect.value;
-
-        if (!recipeId || !price || !imageFile || !category) {
-          alert("Please fill in all fields.");
-          return;
-        }
-
-        // Upload image to Supabase Storage
-        const imagePath = `menu-${Date.now()}-${imageFile.name}`;
-        const { data: storageData, error: storageError } = await supabase
-          .storage
-          .from('menu-images')
-          .upload(imagePath, imageFile);
-
-        if (storageError) {
-          alert("Image upload failed.");
-          console.error(storageError);
-          return;
-        }
-
-        const { data: publicUrlData } = supabase
-          .storage
-          .from('menu-images')
-          .getPublicUrl(imagePath);
-
-        const imageUrl = publicUrlData.publicUrl;
-
-        // Insert new menu item with category
-        const { error: insertError } = await supabase
-          .from('menu_items')
+        status.textContent = 'Menu item updated successfully!';
+      } else {
+        // If no existing menu item is found, create a new one
+        const { error } = await client
+          .from('menu')
           .insert([
             {
               recipe_id: recipeId,
-              price: price,
-              is_available: true,
-              image_url: imageUrl,
-              category: category
+              price: parseFloat(price),
+              description: description
             }
           ]);
 
-        if (insertError) {
-          alert("Failed to add menu item.");
-          console.error(insertError);
-        } else {
-          successMessage.style.display = "block";
-          addMenuItemForm.reset();
-          setTimeout(() => {
-            successMessage.style.display = "none";
-          }, 2000);
-        }
-      });
+        if (error) throw error;
+
+        status.textContent = 'Menu item created successfully!';
+      }
+
+      form.reset();
+      loadMenu();  // Reload the menu list to reflect changes
+    } catch (err) {
+      console.error(err);
+      status.textContent = 'Error saving menu: ' + err.message;
+    }
+  });
+
+  // Delete menu item by id
+  async function deleteMenuItem(menuId) {
+    const { error } = await client.from('menu').delete().eq('id', menuId);
+    if (error) {
+      console.error('Error deleting menu item:', error);
+      return;
+    }
+    loadMenu();
+  }
+
+  // Global variable to store loaded menu items, needed for the edit function
+  let menuItems = [];
+
+  // Load all menu items and display them
+  async function loadMenu() {
+    const { data, error } = await client
+      .from('menu')
+      .select('id, recipe_id, price, description, recipes(name, image_url, category)');
+
+    if (error) {
+      console.error('Error loading menu:', error);
+      return;
+    }
+
+    menuItems = data;
+
+    const menuList = document.getElementById('menu-list');
+    menuList.innerHTML = '';
+
+    menuItems.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'menu-item';
+      div.innerHTML = `
+        <img src="${item.recipes.image_url}" alt="Recipe Image" />
+        <div class="menu-item-details">
+          <strong>${item.recipes.name}</strong>
+          <br>Price: ₱${item.price.toFixed(2)}<br>
+          Description: ${item.description}
+        </div>
+        <div class="actions">
+          <button class="edit" onclick="editMenu('${item.id}')" title="Edit">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="delete" onclick="deleteMenuItem('${item.id}')" title="Delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+      menuList.appendChild(div);
     });
-  </script>
-</body>
-</html>
+  }
+
+  // Edit a menu item. This fills the form fields with the selected item’s details.
+  function editMenu(menuId) {
+    const selectedItem = menuItems.find(item => item.id === menuId);
+    if (!selectedItem) return;
+
+    recipeSelect.value = selectedItem.recipe_id;
+    nameField.value = selectedItem.recipes.name;
+    categoryField.value = selectedItem.recipes.category;
+    imageField.src = selectedItem.recipes.image_url;
+    priceField.value = selectedItem.price;
+    descriptionField.value = selectedItem.description;
+
+    // Change the form submission to update the existing menu item.
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+
+      const recipeId = recipeSelect.value;
+      const price = priceField.value;
+      const description = descriptionField.value;
+
+      if (!recipeId || !price || !description) {
+        status.textContent = 'All fields are required!';
+        return;
+      }
+
+      status.textContent = 'Saving...';
+
+      try {
+        const { error } = await client.from('menu').update({
+          price: parseFloat(price),
+          description: description
+        }).eq('id', menuId);
+
+        if (error) throw error;
+
+        status.textContent = 'Menu updated successfully!';
+        form.reset();
+        loadMenu();
+
+        // Reset the form’s onsubmit to the default
+        form.onsubmit = defaultSubmitHandler;
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Error updating menu: ' + err.message;
+      }
+    };
+  }
+
+  // Store the default submit handler so that we can revert back after editing.
+  const defaultSubmitHandler = form.onsubmit;
+
+
+  const searchInput = document.getElementById('search-input');
+  const categoryFilter = document.getElementById('category-filter');
+  const menuList = document.getElementById('menu-list');
+
+  // Function to display all menu items (you'll replace this with your actual Supabase data)
+  async function loadMenu() {
+  const { data, error } = await client
+    .from('menu')
+    .select('id, recipe_id, price, description, recipes(name, image_url, category)')
+    .order('id', { ascending: false });
+
+  if (error) {
+    console.error('Error loading menu:', error);
+    return;
+  }
+
+  // Save data globally for search/filter
+  window.menuData = data;
+  menuItems = data;
+
+  renderFilteredMenu();
+}
+
+  // Render menu items to the page
+  function renderFilteredMenu() {
+  const searchTerm = searchInput.value.toLowerCase();
+  const selectedCategory = categoryFilter.value;
+
+  const filtered = window.menuData.filter(item => {
+    const nameMatch = item.recipes.name.toLowerCase().includes(searchTerm);
+    const categoryMatch = selectedCategory === '' || item.recipes.category === selectedCategory;
+    return nameMatch && categoryMatch;
+  });
+
+  menuList.innerHTML = '';
+
+  filtered.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'menu-item';
+    div.innerHTML = `
+      <img src="${item.recipes.image_url}" alt="Recipe Image" />
+      <div class="menu-item-details">
+        <strong>${item.recipes.name}</strong>
+        <br>Price: ₱${item.price.toFixed(2)}<br>
+        Description: ${item.description}
+        <br><small>${item.recipes.category}</small>
+      </div>
+      <div class="actions">
+        <button class="edit" onclick="editMenu('${item.id}')" title="Edit">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="delete" onclick="deleteMenuItem('${item.id}')" title="Delete">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    `;
+    menuList.appendChild(div);
+  });
+}
+searchInput.addEventListener('input', renderFilteredMenu);
+categoryFilter.addEventListener('change', renderFilteredMenu);
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadRecipes();
+    loadMenu();
+  });
+
+  // Toggle dropdown
+  const userIcon = document.querySelector('.user-icon');
+    const dropdown = document.querySelector('.dropdown');
+  
+    userIcon.addEventListener('click', () => {
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+  
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-menu')) {
+        dropdown.style.display = 'none';
+      }
+    });
+  
+    // Logout functionality
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      // Clear session or perform any other logout actions here
+      window.location.href = "adminLOGIN.html"; // Redirect to login page
+    });
+    
+    </script>
+  </body>
+  </html>
+  
