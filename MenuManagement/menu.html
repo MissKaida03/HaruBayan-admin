@@ -321,35 +321,52 @@ body {
 .menu-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between; /* Pushes content + buttons apart */
   text-align: center;
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 8px;
   background-color: #fff;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  height: 320px; /* fixed height */
+  height: 360px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
+
 .menu-item img {
   width: 100%;
-  height: 150px; /* fixed image height */
+  height: 150px;
   object-fit: cover;
   border-radius: 5px;
 }
-
 
 .menu-item-details {
   margin-top: 10px;
   font-size: 14px;
   color: #333;
+  max-height: 100px; /* Adjust based on your layout */
+  overflow-y: auto;
+  padding-right: 5px; /* Prevent scrollbar from overlapping text */
 }
+
+.menu-item-details::-webkit-scrollbar {
+  width: 5px;
+}
+.menu-item-details::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
 
 .actions {
   margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
+
 
 button {
   margin: 5px;
@@ -460,6 +477,16 @@ footer {
     margin-top: 30px;
 }
 
+.available {
+  color: green;
+  font-weight: bold;
+}
+
+.unavailable {
+  color: red;
+  font-weight: bold;
+}
+
 
 /* Make layout stack (column) on smaller screens */
 @media (max-width: 768px) {
@@ -553,12 +580,12 @@ footer {
       // If an existing menu item is found, update it
       if (existing) {
         const { error } = await client
-          .from('menu')
-          .update({
-            price: parseFloat(price),
-            description: description
-          })
-          .eq('id', existing.id);
+        .from('menu')
+        .update({
+        price: parseFloat(price),
+        description: description
+      })
+        .eq('id', existing.id);
 
         if (error) throw error;
 
@@ -571,12 +598,12 @@ footer {
             {
               recipe_id: recipeId,
               price: parseFloat(price),
-              description: description
+              description: description,
+              available: true // Default to available on creation
             }
           ]);
 
         if (error) throw error;
-
         status.textContent = 'Menu item created successfully!';
       }
 
@@ -698,62 +725,81 @@ footer {
 
   // Function to display all menu items (you'll replace this with your actual Supabase data)
   async function loadMenu() {
-  const { data, error } = await client
-    .from('menu')
-    .select('id, recipe_id, price, description, recipes(name, image_url, category)')
-    .order('id', { ascending: false });
-
-  if (error) {
-    console.error('Error loading menu:', error);
-    return;
-  }
-
-  // Save data globally for search/filter
-  window.menuData = data;
-  menuItems = data;
-
-  renderFilteredMenu();
-}
+    const { data, error } = await client
+      .from('menu')
+      .select('id, recipe_id, price, description, available, recipes(name, image_url, category)')
+      .order('id', { ascending: false });
+  
+    if (error) {
+      console.error('Error loading menu:', error);
+      return;
+    }
+  
+    window.menuData = data;
+    menuItems = data;
+    renderFilteredMenu();
+  }  
 
   // Render menu items to the page
   function renderFilteredMenu() {
-  const searchTerm = searchInput.value.toLowerCase();
-  const selectedCategory = categoryFilter.value;
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedCategory = categoryFilter.value;
+  
+    const filtered = window.menuData.filter(item => {
+      const nameMatch = item.recipes.name.toLowerCase().includes(searchTerm);
+      const categoryMatch = selectedCategory === '' || item.recipes.category === selectedCategory;
+      return nameMatch && categoryMatch;
+    });
+  
+    menuList.innerHTML = '';
+  
+    filtered.forEach(item => {
+      const availabilityText = item.available ? 'Available' : 'Unavailable';
+      const availabilityClass = item.available ? 'available' : 'unavailable';
+  
+      const div = document.createElement('div');
+      div.className = 'menu-item';
+      div.innerHTML = `
+        <img src="${item.recipes.image_url}" alt="Recipe Image" />
+        <div class="menu-item-details">
+          <strong>${item.recipes.name}</strong><br>
+          Price: ₱${item.price.toFixed(2)}<br>
+          Description: ${item.description}<br>
+          <small>${item.recipes.category}</small><br>
+          <span class="${availabilityClass}">${availabilityText}</span>
+        </div>
+        <div class="actions">
+          <button onclick="toggleAvailability('${item.id}', ${item.available})" title="Toggle Availability">
+            ${item.available ? 'Mark Unavailable' : 'Mark Available'}
+          </button>
+          <button class="edit" onclick="editMenu('${item.id}')" title="Edit">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="delete" onclick="deleteMenuItem('${item.id}')" title="Delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+      menuList.appendChild(div);
+    });
+  }
 
-  const filtered = window.menuData.filter(item => {
-    const nameMatch = item.recipes.name.toLowerCase().includes(searchTerm);
-    const categoryMatch = selectedCategory === '' || item.recipes.category === selectedCategory;
-    return nameMatch && categoryMatch;
-  });
+async function toggleAvailability(menuId, currentStatus) {
+  const newStatus = !currentStatus;
+  const { error } = await client
+    .from('menu')
+    .update({ available: newStatus })
+    .eq('id', menuId);
 
-  menuList.innerHTML = '';
-
-  filtered.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'menu-item';
-    div.innerHTML = `
-      <img src="${item.recipes.image_url}" alt="Recipe Image" />
-      <div class="menu-item-details">
-        <strong>${item.recipes.name}</strong>
-        <br>Price: ₱${item.price.toFixed(2)}<br>
-        Description: ${item.description}
-        <br><small>${item.recipes.category}</small>
-      </div>
-      <div class="actions">
-        <button class="edit" onclick="editMenu('${item.id}')" title="Edit">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button class="delete" onclick="deleteMenuItem('${item.id}')" title="Delete">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    `;
-    menuList.appendChild(div);
-  });
+  if (error) {
+    console.error('Error toggling availability:', error);
+    return;
+  }
+  loadMenu(); // Refresh the list to reflect changes
 }
+  
 searchInput.addEventListener('input', renderFilteredMenu);
 categoryFilter.addEventListener('change', renderFilteredMenu);
-
 
   document.addEventListener('DOMContentLoaded', () => {
     loadRecipes();
