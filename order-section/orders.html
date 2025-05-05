@@ -5,7 +5,7 @@
   <title>Manage Orders</title>
   <link rel="icon" type="image/png" href="../HaruBayan_ADMIN/imgs/logo-harubayan.png"/>
   <style>
-    * {
+ * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -276,9 +276,7 @@
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="dinein-body">
-        <!-- Dine-in orders will be dynamically inserted here -->
-      </tbody>
+      <tbody id="dinein-body"></tbody>
     </table>
   </div>
 
@@ -292,9 +290,7 @@
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="takeout-body">
-        <!-- Take-out orders will be dynamically inserted here -->
-      </tbody>
+      <tbody id="takeout-body"></tbody>
     </table>
   </div>
 
@@ -303,42 +299,30 @@
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
       <h3>Ordered Items</h3>
-      <div id="orderItemsList">
-        <!-- List of items will be dynamically inserted here -->
-      </div>
+      <div id="orderItemsList"></div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
-    const dineinOrders = [
-      { customer: "Christine", tableNumber: 5, status: "Pending", items: [
-        { name: "Herbal Tea", description: "A calming drink", quantity: 2 },
-        { name: "Grilled Veggies", description: "Fresh grilled vegetables", quantity: 1 }
-      ] },
-      { customer: "Jade", tableNumber: 12, status: "Pending", items: [
-        { name: "Ramen", description: "Spicy ramen with broth", quantity: 2 },
-        { name: "Fruit Salad", description: "Mixed fruits", quantity: 1 }
-      ] },
-    ];
+    const SUPABASE_URL = 'https://lngdoqimxolarajflobo.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const takeoutOrders = [
-      { customer: "Reiven", status: "Delivered", items: [
-        { name: "Healthy Soup", description: "Vegetable-based soup", quantity: 2 },
-        { name: "Fruit Juice", description: "Fresh orange juice", quantity: 1 }
-      ] },
-      { customer: "James", status: "Pending", items: [
-        { name: "Herbal Juice", description: "Refreshing herb drink", quantity: 2 },
-        { name: "Salad", description: "Fresh green salad", quantity: 1 }
-      ] },
-    ];
+    const dineinOrders = JSON.parse(localStorage.getItem('dineinOrders')) || [];
+    const takeoutOrders = JSON.parse(localStorage.getItem('takeoutOrders')) || [];
 
     const dineinTbody = document.getElementById('dinein-body');
     const takeoutTbody = document.getElementById('takeout-body');
     const orderModal = document.getElementById('orderModal');
     const orderItemsList = document.getElementById('orderItemsList');
 
+    function saveOrders() {
+      localStorage.setItem('dineinOrders', JSON.stringify(dineinOrders));
+      localStorage.setItem('takeoutOrders', JSON.stringify(takeoutOrders));
+    }
+
     function renderOrders() {
-      // Render Dine-in Orders
       dineinTbody.innerHTML = '';
       dineinOrders.forEach((order, index) => {
         const row = document.createElement('tr');
@@ -356,7 +340,6 @@
         dineinTbody.appendChild(row);
       });
 
-      // Render Take-out Orders
       takeoutTbody.innerHTML = '';
       takeoutOrders.forEach((order, index) => {
         const row = document.createElement('tr');
@@ -377,33 +360,26 @@
     function markAsDelivered(orderType, index) {
       if (orderType === 'dinein') {
         dineinOrders[index].status = 'Delivered';
-      } else if (orderType === 'takeout') {
+      } else {
         takeoutOrders[index].status = 'Delivered';
       }
+      saveOrders();
       renderOrders();
     }
 
     function viewItems(index, orderType) {
-      let items = [];
-      if (orderType === 'dinein') {
-        items = dineinOrders[index].items;
-      } else if (orderType === 'takeout') {
-        items = takeoutOrders[index].items;
-      }
-
+      const items = orderType === 'dinein' ? dineinOrders[index].items : takeoutOrders[index].items;
       orderItemsList.innerHTML = '';
       items.forEach(item => {
         const div = document.createElement('div');
         div.classList.add('order-item');
         div.innerHTML = `
           <div class="item-name">${item.name}</div>
-          <div class="item-description">${item.description}</div>
+          <div class="item-description">${item.description || ''}</div>
           <div class="item-quantity">Quantity: ${item.quantity}</div>
         `;
         orderItemsList.appendChild(div);
       });
-
-      // Open Modal
       orderModal.style.display = 'block';
     }
 
@@ -411,17 +387,16 @@
       orderModal.style.display = 'none';
     }
 
+    // Show current date/time
     function updateDateTime() {
       const now = new Date();
-      const date = now.toLocaleDateString();
-      const time = now.toLocaleTimeString();
-      document.getElementById('datetime').textContent = `${date} - ${time}`;
+      document.getElementById('datetime').textContent = now.toLocaleString();
     }
-
-    updateDateTime();
     setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // Initialize rendering
     renderOrders();
   </script>
-
 </body>
 </html>
