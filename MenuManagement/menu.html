@@ -836,11 +836,11 @@ document.getElementById('confirmNo').addEventListener('click', () => {
       div.innerHTML = `
         <img src="${item.recipes.image_url}" alt="Recipe Image" />
         <div class="menu-item-details">
+          <span class="${availabilityClass}">${availabilityText}</span><br>
           <strong>${item.recipes.name}</strong><br>
           Price: ₱${item.price.toFixed(2)}<br>
           Description: ${item.description}<br>
           <small>${item.recipes.category}</small><br>
-          <span class="${availabilityClass}">${availabilityText}</span>
         </div>
         <div class="actions">
           <button onclick="toggleAvailability('${item.id}', ${item.available})" title="Toggle Availability">
@@ -857,6 +857,7 @@ document.getElementById('confirmNo').addEventListener('click', () => {
       menuList.appendChild(div);
     });
   }
+
 
 async function toggleAvailability(menuId, currentStatus) {
   const newStatus = !currentStatus;
