@@ -9,9 +9,29 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchRecipes();
 
   document.getElementById('recipe-form').addEventListener('submit', handleSubmit);
+  document.getElementById('cancel-button').addEventListener('click', handleCancel);  // Add event listener for Cancel button
   document.getElementById('search-bar').addEventListener('input', filterRecipes);
   document.getElementById('sort-category').addEventListener('change', filterRecipes);
 });
+
+// Handle form cancel
+function handleCancel() {
+  const isEditing = document.getElementById('recipe-id').value;
+  
+  if (!isEditing) return; // Do nothing if not editing
+
+  const confirmCancel = confirm("Cancel editing this recipe? Any unsaved changes will be lost.");
+  if (!confirmCancel) return;
+
+  // Reset form and UI
+  document.getElementById('recipe-form').reset();
+  document.getElementById('form-title').textContent = 'Add New Recipe';
+  document.getElementById('recipe-id').value = ''; 
+  document.getElementById('status').textContent = 'Edit cancelled.';
+
+  document.getElementById('cancel-button').style.display = 'none';
+}
+
 
 // Handle form submit
 async function handleSubmit(event) {
@@ -106,8 +126,10 @@ async function handleSubmit(event) {
   document.getElementById('recipe-form').reset();
   document.getElementById('form-title').textContent = 'Add New Recipe';
   document.getElementById('status').textContent = 'Recipe saved successfully!';
+  document.getElementById('cancel-button').style.display = 'none'; // hides cancel button
   fetchRecipes();
 }
+
 
 // Fetch and display recipes
 async function fetchRecipes() {
@@ -124,19 +146,27 @@ async function fetchRecipes() {
   data.forEach(recipe => {
     const card = document.createElement('div');
     card.className = 'recipe-card';
+  
+    const shortDesc = recipe.description.length > 70 
+  ? recipe.description.slice(0, 70) + ' ... ' 
+  : recipe.description;
 
     card.innerHTML = `
       <img src="${recipe.image_url || '../../imgs/default.jpg'}" alt="${recipe.name}">
       <div class="recipe-info">
         <h4>${recipe.name}</h4>
         <p>${recipe.category}</p>
-        <p>${recipe.description}</p>  <!-- Show description here -->
-        <div class="btn-group">
-          <button onclick="editRecipe('${recipe.id}')"><i class="fas fa-edit"></i></button>
-          <button onclick="deleteRecipe('${recipe.id}')"><i class="fas fa-trash-alt"></i></button>
-        </div>
-      </div>
-    `;
+        <p class="truncate">${shortDesc.replace(/\n/g, '<br>')}</p>
+    ${recipe.description.length > 100
+      ? `<button onclick='showFullDescription(${JSON.stringify(recipe.name)}, ${JSON.stringify(recipe.description)}, ${JSON.stringify(recipe.image_url || "../../imgs/default.jpg")})'>Show More</button>`
+      : ''
+    }
+    <div class="btn-group">
+      <button onclick="editRecipe('${recipe.id}')"><i class="fas fa-edit"></i></button>
+      <button onclick="deleteRecipe('${recipe.id}')"><i class="fas fa-trash-alt"></i></button>
+    </div>
+  </div>
+  `;
 
     container.appendChild(card);
   });
@@ -178,6 +208,9 @@ async function editRecipe(id) {
   document.getElementById('category').value = recipe.category;
   document.getElementById('description').value = recipe.description; // Add description to the form
   document.getElementById('form-title').textContent = 'Edit Recipe';
+
+  // Shows the cancel button
+  document.getElementById('cancel-button').style.display = 'inline-block';
 }
 
 // Delete recipe
@@ -201,4 +234,60 @@ async function deleteRecipe(id) {
   }
 
   fetchRecipes();
+}
+
+function showFullDescription(title, description, imageUrl) {
+  document.getElementById('modalTitle').textContent = title;
+
+  const safeDescription = escapeHtml(description).replace(/\n/g, '<br>');
+  document.getElementById('modalDescription').innerHTML = safeDescription;
+
+  const modalImage = document.getElementById('modalImage');
+  if (imageUrl) {
+    modalImage.src = imageUrl;
+    modalImage.style.display = 'block';
+  } else {
+    modalImage.style.display = 'none';
+  }
+
+  const modal = document.getElementById('descriptionModal');
+  modal.style.display = 'flex';
+  document.body.classList.add('modal-open'); // Lock scroll
+}
+
+function closeModal() {
+  document.getElementById('descriptionModal').style.display = 'none';
+  document.body.classList.remove('modal-open'); // Unlock scroll
+}
+
+// Close when clicking outside modal content
+window.addEventListener('click', function(event) {
+  const modal = document.getElementById('descriptionModal');
+  const content = document.querySelector('.modal-content');
+
+  if (event.target === modal) {
+    closeModal();
+  }
+});
+
+window.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeModal();
+  }
+});
+
+window.onclick = function(event) {
+  const modal = document.getElementById('descriptionModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }

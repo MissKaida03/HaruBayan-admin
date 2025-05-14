@@ -104,6 +104,7 @@
           <input type="file" id="image" accept="image/*">
   
           <button type="submit">Save Recipe</button>
+          <button type="button" id="cancel-button" style="display: none;">Cancel</button>
           <p id="status"></p>
         </form>
       </div>
@@ -116,6 +117,14 @@
     Copyright © 2025 Haru-Bayan. Created by MyTech Corp.
   </footer>    
 
+  <!-- Modal -->
+  <div id="descriptionModal" class="modal-overlay">
+    <div class="modal-content">
+      <h2 id="modalTitle"></h2>
+      <img id="modalImage" src="" alt="" style="max-width: 100%; margin-bottom: 10px;" />
+      <p id="modalDescription"></p>
+    </div>
+  </div>
   
 
 </body>
