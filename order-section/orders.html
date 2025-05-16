@@ -4,67 +4,238 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Customer Orders</title>
+  <link rel="icon" type="image/png" href="../imgs/logo-harubayan.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
       padding: 2rem;
-      background-color: #f4f4f4;
+      background: linear-gradient(to bottom right, #fef1f4, #fff);
+      color: #333;
     }
+
+
+    .back-button {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: #8b0013;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+
+    .back-button:hover {
+      background-color: #a91c2a;
+    }
+
+
     h1 {
+      margin-top: -1%;
       text-align: center;
+      font-size: 2rem;
+      color: #8b0013;
+      font-weight: bolder;
+      font-family: Arial, Helvetica, sans-serif;
     }
+
+
+    .description {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #555;
+      margin-top: -1rem;
+      margin-bottom: 3rem;
+    }
+
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      justify-content: center;
+    }
+
+
+    .search-container input,
+    .filter-container select {
+      padding: 12px 14px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+      background-color: #fff;
+      transition: border 0.3s;
+    }
+
+
+    .search-container input:focus,
+    .filter-container select:focus {
+      border-color: #8b0013;
+      outline: none;
+    }
+
+
+    .search-container,
+    .filter-container {
+      flex: 1 1 250px;
+      display: flex;
+      flex-direction: column;
+    }
+
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      background-color: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-width: 800px;
     }
+
+
     th, td {
-      padding: 12px 16px;
-      border: 1px solid #ddd;
+      padding: 16px 20px;
       text-align: left;
+      font-size: 0.95rem;
+      border: 1px solid #f3c6c6;
     }
+
+
     th {
-      background-color: #007BFF;
-      color: white;
+      background-color: #8b0013;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
+
+
     tr:nth-child(even) {
-      background-color: #f9f9f9;
+      background-color: #f9f3f5;
     }
-    .status {
-      text-transform: capitalize;
-      font-weight: bold;
-      cursor: pointer;
+
+
+    tr:hover {
+      background-color: #f1e7ea;
     }
+
+
     .status-select {
-      width: 120px;
-      padding: 5px;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+
+    @media (max-width: 768px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+
+      th, td {
+        font-size: 0.85rem;
+      }
+
+
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+
+
+    footer {
+      background-color: #8b0013;
+      color: white;
+      text-align: center;
+      font-size: 13px;
+      padding: 15px;
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
+
+
+  <a href="#" class="back-button" onclick="history.back()">← Back</a>
+
+
   <h1>Customer Orders</h1>
-  <table id="ordersTable">
-    <thead>
-      <tr>
-        <th>Customer Username</th>
-        <th>Order</th>
-        <th>Quantity</th>
-        <th>Price</th>
-        <th>Delivery Type</th>
-        <th>Status</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <p class="description">Manage and track customer orders in real time.</p>
+
+
+  <div class="controls">
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search by username or date (YYYY-MM-DD)">
+    </div>
+    <div class="filter-container">
+      <select id="deliveryFilter">
+        <option value="">All Delivery Types</option>
+        <option value="dine-in">Dine-In</option>
+        <option value="takeout">Takeout</option>
+      </select>
+    </div>
+    <div class="filter-container">
+      <select id="statusFilter">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+        <option value="delivered">Delivered</option>
+        <option value="canceled">Canceled</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div class="table-container">
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Order</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Delivery</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+
+  <footer>
+    Copyright © 2025 Haru-Bayan. Created by MyTech Corp.
+  </footer>
+
 
   <script>
     const SUPABASE_URL = 'https://lngdoqimxolarajflobo.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZ2RvcWlteG9sYXJhamZsb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MjQ5MDQsImV4cCI6MjA2MDAwMDkwNH0.hDroH3E7cq-RHh8iGsbg5s1tdYVSHMI94ZSZXzoABic';
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+    let allOrders = [];
+
 
     async function loadOrders() {
       const { data, error } = await client
@@ -89,17 +260,27 @@
           )
         `);
 
+
       if (error) {
         console.error('Error fetching orders:', error);
         return;
       }
 
+
+      allOrders = data;
+      displayOrders(data);
+    }
+
+
+    function displayOrders(data) {
       const tbody = document.querySelector('#ordersTable tbody');
-      tbody.innerHTML = ''; // clear existing rows
+      tbody.innerHTML = '';
+
 
       data.forEach(order => {
         const customer = order.customers_order?.customer;
         const recipe = order.customers_order?.menu_item?.recipe;
+
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -108,7 +289,7 @@
           <td>${order.customers_order?.quantity || 0}</td>
           <td>₱${parseFloat(order.customers_order?.total_price || 0).toFixed(2)}</td>
           <td>${order.delivery_type}</td>
-          <td class="status" data-order-id="${order.id}">
+          <td>
             <select class="status-select" data-order-id="${order.id}">
               <option value="pending" ${order.order_status === 'pending' ? 'selected' : ''}>Pending</option>
               <option value="completed" ${order.order_status === 'completed' ? 'selected' : ''}>Completed</option>
@@ -121,32 +302,67 @@
         tbody.appendChild(row);
       });
 
-      // Add change event for dropdown to update status
-      const statusSelects = document.querySelectorAll('.status-select');
-      statusSelects.forEach(select => {
+
+      document.querySelectorAll('.status-select').forEach(select => {
         select.addEventListener('change', handleStatusChange);
       });
     }
+
 
     async function handleStatusChange(event) {
       const orderId = event.target.getAttribute('data-order-id');
       const newStatus = event.target.value;
 
-      // Update the status in Supabase
+
       const { data, error } = await client
         .from('place_order')
         .update({ order_status: newStatus })
         .eq('id', orderId);
 
+
       if (error) {
         console.error('Error updating order status:', error);
       } else {
-        console.log('Order status updated:', data);
-        loadOrders();  // Refresh the table
+        const index = allOrders.findIndex(order => order.id == orderId);
+        if (index !== -1) {
+          allOrders[index].order_status = newStatus;
+        }
+        filterAndSort(); // Do not reload everything — just re-display
       }
     }
+
+
+    document.getElementById('searchInput').addEventListener('input', filterAndSort);
+    document.getElementById('deliveryFilter').addEventListener('change', filterAndSort);
+    document.getElementById('statusFilter').addEventListener('change', filterAndSort);
+
+
+    function filterAndSort() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const deliveryType = document.getElementById('deliveryFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+
+      const filtered = allOrders.filter(order => {
+        const username = order.customers_order?.customer?.username?.toLowerCase() || '';
+        const date = new Date(order.order_time).toISOString().split('T')[0];
+        const matchSearch = username.includes(searchTerm) || date.includes(searchTerm);
+        const matchDelivery = deliveryType ? order.delivery_type === deliveryType : true;
+        const matchStatus = status ? order.order_status === status : true;
+
+
+        return matchSearch && matchDelivery && matchStatus;
+      });
+
+
+      displayOrders(filtered);
+    }
+
 
     loadOrders();
   </script>
 </body>
 </html>
+
+
+
