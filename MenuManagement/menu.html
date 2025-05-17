@@ -37,10 +37,10 @@
     </div>
   </div>
 
-  <!-- Back Button -->
+  <!-- Back Button
   <div class="back-btn-container">
     <a href="../dashboard/dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back </a>
-  </div>
+  </div> -->
 
   <header class="page-header">
     <h1>Menu Management</h1>
@@ -246,6 +246,7 @@ body {
 .page-header h1 {
     font-size: 40px;
     margin-bottom: 2%;
+    margin-top: 7%;
 }
 
 .page-header p {
@@ -395,6 +396,7 @@ button {
     padding: 20px;
     border-radius: 10px;
     background-color: #f0d1d1;
+    height: fit-content;
 }
 
 /* Status message */
@@ -431,7 +433,7 @@ form select {
 }
 
 /*back button*/
-.back-btn-container {
+/* .back-btn-container {
       padding: 20px;
       text-align: left;
     }
@@ -453,7 +455,7 @@ form select {
   
     .back-btn i {
       margin-right: 8px;
-    }
+    } */
 
 /* Submit button */
 button[type="submit"] {
@@ -480,14 +482,18 @@ button[type="submit"]:hover {
 }
 
 /* FOOTER */
-footer {
+  footer {
     background-color: #8b0013;
     color: white;
     text-align: center;
     font-size: 13px;
     padding: 15px;
-    margin-top: 30px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
+
 
 .available {
   color: green;
