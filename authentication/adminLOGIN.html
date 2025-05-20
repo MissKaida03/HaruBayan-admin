@@ -265,7 +265,7 @@ loginBtn.addEventListener('click', async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken,
+    "X-CSRFToken": getCookie("csrftoken"),  // Use this function below
       },
       credentials: 'include',
       body: JSON.stringify({ username, password }),
