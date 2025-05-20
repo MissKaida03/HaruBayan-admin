@@ -181,19 +181,20 @@
 
   <script>
     function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-          cookie = cookie.trim();
-          if (cookie.startsWith(name + '=')) {
-            cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
-            break;
-          }
-        }
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
       }
-      return cookieValue;
     }
+  }
+  return cookieValue;
+}
+
 
     const loginBtn = document.getElementById('login-btn');
     const usernameInput = document.getElementById('username');
@@ -224,9 +225,11 @@
 
     async function fetchCSRF() {
       try {
-        await fetch('http://127.0.0.1:8000/api/csrf/', {
-          credentials: 'include',
-        });
+        // Get CSRF cookie first!
+await fetch('http://127.0.0.1:8000/api/csrf/', {
+  credentials: 'include'
+});
+
       } catch (err) {
         console.error('CSRF fetch failed:', err);
       }
