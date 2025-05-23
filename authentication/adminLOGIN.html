@@ -226,7 +226,7 @@
     async function fetchCSRF() {
       try {
         // Get CSRF cookie first!
-await fetch('http://127.0.0.1:8000/api/csrf/', {
+await fetch('https://adminharubackend.onrender.com/api/csrf/', {
   credentials: 'include'
 });
 
@@ -247,7 +247,7 @@ await fetch('http://127.0.0.1:8000/api/csrf/', {
       try {
         await fetchCSRF(); // ensure CSRF cookie is set
 
-        const res = await fetch('http://127.0.0.1:8000/api/login/', {
+        const res = await fetch('https://adminharubackend.onrender.com/api/login/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -285,7 +285,7 @@ await fetch('http://127.0.0.1:8000/api/csrf/', {
       }
 
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/verify-otp/', {
+        const res = await fetch('https://adminharubackend.onrender.com/api/verify-otp/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
