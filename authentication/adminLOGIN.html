@@ -245,17 +245,27 @@ await fetch('https://adminharubackend.onrender.com/api/csrf/', {
       }
 
       try {
-        await fetchCSRF(); // ensure CSRF cookie is set
+        await fetchCSRF(); // fetches and sets the cookie
+
+        // Wait a short moment to allow browser to store the cookie
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Now read the token from the cookie
+        const csrfToken = getCookie('csrftoken');
+          if (!csrfToken || csrfToken.length < 10) {
+            displayNotification('CSRF token missing or invalid. Try reloading.', 'error');
+          return;
+          }
 
         const res = await fetch('https://adminharubackend.onrender.com/api/login/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-          },
-          credentials: 'include',
-          body: JSON.stringify({ username, password }),
-        });
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }),
+      });
 
         const data = await res.json();
 
