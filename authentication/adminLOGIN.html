@@ -295,38 +295,46 @@ await fetch('https://adminharubackend.onrender.com/api/csrf/', {
       }
 
       try {
-        const res = await fetch('https://adminharubackend.onrender.com/api/verify-otp/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-          },
-          credentials: 'include',
-          body: JSON.stringify({ otp_code: otp }),
-        });
+  await fetchCSRF(); // fetches and sets the cookie
 
-        const data = await res.json();
+  // Wait a short moment to allow browser to store the cookie
+  await new Promise(resolve => setTimeout(resolve, 100));
 
-        if (!res.ok) {
-          displayNotification(data.detail || data.error || 'OTP verification failed!', 'error');
-          return;
-        }
+  // Now read the token from the cookie
+  const csrfToken = getCookie('csrftoken');
+  if (!csrfToken || csrfToken.length < 10) {
+    displayNotification('CSRF token missing or invalid. Try reloading.', 'error');
+    return;
+  }
 
-        displayNotification('Login successful! Redirecting...', 'success');
+  const res = await fetch('https://adminharubackend.onrender.com/api/login/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    credentials: 'include',
+    body: JSON.stringify({ username, password }),
+  });
 
-        setTimeout(() => {
-          const role = data.role;
-          if (role === 'recipe') window.location.href = '../recipe-section/AdminRecipeChoice.html';
-          else if (role === 'menu') window.location.href = '../MenuManagement/menu.html';
-          else if (role === 'order') window.location.href = '../order-section/orders.html';
-          else if (role === 'superadmin') window.location.href = '../authentication/adminLOGIN.html';
-          else displayNotification('Unknown role.', 'error');
-        }, 1500);
+  const data = await res.json();
 
-      } catch (err) {
-        otpMessage.textContent = 'Server error during OTP verification.';
-        console.error(err);
-      }
+  if (!res.ok) {
+    displayNotification(data.detail || data.error || 'Login failed', 'error');
+    return;
+  }
+
+  currentUsername = username;
+  currentPassword = password;
+
+  displayNotification('OTP sent to your email. Please check.', 'success');
+  otpModal.style.display = 'flex';
+
+} catch (err) {
+  displayNotification('Server error. Try again later.', 'error');
+  console.error(err);
+}
+
     });
 
     window.onclick = function(event) {
